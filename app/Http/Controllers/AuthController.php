@@ -26,6 +26,9 @@ class AuthController extends Controller
     /**
      * Handle a login request
      */
+    /**
+     * Handle a login request
+     */
     public function login(Request $request)
     {
         // Validate input with French messages
@@ -83,13 +86,54 @@ class AuthController extends Controller
             // Set success message based on role
             $message = $user->role === 'admin' ? 'Bienvenue, Administrateur !' : 'Bienvenue !';
             
-            return redirect()->intended('/dashboard')->with('success', $message);
+            // Get redirect URL: intended URL or dashboard
+            $redirectUrl = $this->getRedirectUrl();
+            
+            return redirect($redirectUrl)->with('success', $message);
         }
 
         // Authentication failed
         return back()
             ->withErrors(['email' => 'Les identifiants fournis sont incorrects.'])
             ->withInput($request->only('email'));
+    }
+
+    /**
+     * Get the appropriate redirect URL after login
+     */
+    private function getRedirectUrl(): string
+    {
+        // Check for intended URL first (from Laravel's intended mechanism)
+        $intended = session()->pull('url.intended');
+        
+        // If there's an intended URL and it's not a login-related page, use it
+        if ($intended && $this->isValidRedirectUrl($intended)) {
+            return $intended;
+        }
+        
+        // Otherwise, redirect to dashboard (same URL for all users)
+        return route('dashboard');
+    }
+
+    /**
+     * Check if the URL is valid for redirection
+     */
+    private function isValidRedirectUrl(?string $url): bool
+    {
+        if (!$url) {
+            return false;
+        }
+        
+        // Don't redirect to auth-related pages
+        $excludedPaths = ['/login', '/logout', '/forgot-password', '/reset-password'];
+        
+        foreach ($excludedPaths as $path) {
+            if (str_contains($url, $path)) {
+                return false;
+            }
+        }
+        
+        return true;
     }
 
     /**
