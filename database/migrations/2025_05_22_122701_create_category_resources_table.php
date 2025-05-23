@@ -11,16 +11,27 @@ return new class extends Migration
         Schema::create('category_resources', function (Blueprint $table) {
             $table->id();
             $table->foreignId('category_id')->constrained('ebook_categories')->onDelete('cascade');
-            $table->foreignId('content_type_id')->constrained('resource_content_types')->onDelete('cascade');
+            $table->enum('content_type', [
+                'pdf', 
+                'image', 
+                'docx', 
+                'pptx', 
+                'xlsx',
+                'table', 
+                'supplier_info', 
+                'product_data', 
+                'text_content',
+                'form'
+            ])->default('text_content');
             $table->string('title');
             $table->text('description')->nullable();
-            $table->json('content_data'); // Flexible JSON field for different content types
-            $table->string('file_path')->nullable(); // For PDF, images, etc.
+            $table->json('content_data')->nullable();
+            $table->string('file_path')->nullable();
             $table->integer('sort_order')->default(0);
             $table->boolean('is_active')->default(true);
             $table->timestamps();
             
-            $table->index(['category_id', 'content_type_id']);
+            $table->index(['category_id', 'content_type']);
         });
     }
 

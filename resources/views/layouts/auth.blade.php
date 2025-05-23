@@ -7,9 +7,9 @@
 
     <title>{{ config('app.name', 'Made in China') }}</title>
 
-    <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="icon" type="image/svg+xml" href="{{ asset('assets/images/logo.svg') }}">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     
     <!-- RemixIcon CDN -->
@@ -72,54 +72,26 @@
         }
     </style>
     
-    <!-- 3D Logo Animation Styles -->
+    <!-- GIF Logo Animation Styles -->
     <style>
-        /* Container for 3D perspective */
-        .logo-3d-container {
-            perspective: 1000px;
-            /* This creates the 3D viewing perspective */
-        }
-        
-        /* The rotating logo wrapper */
-        .logo-3d-wrapper {
+        /* Container for logo */
+        .logo-gif-container {
             position: relative;
             display: inline-block;
-            transform-style: preserve-3d;
-            /* Ensures child elements maintain 3D positioning */
-            animation: rotateY360 2s linear infinite;
-            /* 4 second rotation, continuous */
+            transition: transform 0.3s ease;
         }
         
-        /* The actual logo with shadow and lighting effects */
-        .logo-3d {
+        /* The actual logo GIF */
+        .logo-gif {
             display: block;
             width: auto;
             height: 120px;
             /* Subtle shadow for depth */
             filter: drop-shadow(0 10px 20px rgba(134, 34, 199, 0.3));
-            /* Backface visibility ensures smooth rotation */
-            backface-visibility: visible;
-            /* Slight upward tilt for better 3D effect */
-            transform: rotateX(-5deg);
+            transition: filter 0.3s ease, transform 0.3s ease;
         }
         
-        /* Reflection effect underneath the logo */
-        .logo-reflection {
-            position: absolute;
-            top: 100%;
-            left: 0;
-            right: 0;
-            height: 30%;
-            background: linear-gradient(to bottom, 
-                rgba(134, 34, 199, 0.1) 0%, 
-                transparent 100%);
-            transform: scaleY(-1) translateY(-1px);
-            opacity: 0.3;
-            filter: blur(2px);
-            pointer-events: none;
-        }
-        
-        /* Glow effect that pulses */
+        /* Glow effect behind logo */
         .logo-glow {
             position: absolute;
             top: 50%;
@@ -127,64 +99,50 @@
             width: 150%;
             height: 150%;
             background: radial-gradient(circle, 
-                rgba(134, 34, 199, 0.2) 0%, 
+                rgba(134, 34, 199, 0.3) 0%, 
                 transparent 70%);
             transform: translate(-50%, -50%);
-            animation: glow 2s ease-in-out infinite alternate;
+            animation: glow 3s ease-in-out infinite alternate;
             pointer-events: none;
             z-index: -1;
-        }
-        
-        /* Y-axis rotation animation */
-        @keyframes rotateY360 {
-            0% {
-                transform: rotateY(0deg) rotateX(-5deg);
-            }
-            100% {
-                transform: rotateY(360deg) rotateX(-5deg);
-            }
         }
         
         /* Subtle glow animation */
         @keyframes glow {
             0% {
-                opacity: 0.3;
-                transform: translate(-50%, -50%) scale(0.9);
+                opacity: 0.2;
+                transform: translate(-50%, -50%) scale(0.8);
             }
             100% {
-                opacity: 0.6;
-                transform: translate(-50%, -50%) scale(1.1);
+                opacity: 0.5;
+                transform: translate(-50%, -50%) scale(1.2);
             }
         }
         
-        /* Enhanced lighting effect on hover */
-        .logo-3d-container:hover .logo-3d-wrapper {
-            animation-play-state: paused;
-            /* Pause rotation on hover */
+        /* Enhanced effects on hover */
+        .logo-gif-container:hover {
+            transform: scale(1.05);
         }
         
-        .logo-3d-container:hover .logo-3d {
+        .logo-gif-container:hover .logo-gif {
             filter: drop-shadow(0 15px 30px rgba(134, 34, 199, 0.5)) 
                     brightness(1.1);
-            /* Brighter and stronger shadow on hover */
-            transition: filter 0.3s ease;
         }
         
-        /* Loading state - logo fades in with rotation */
+        /* Loading state - logo fades in */
         @keyframes logoEntry {
             0% {
                 opacity: 0;
-                transform: rotateY(180deg) rotateX(-5deg) scale(0.8);
+                transform: scale(0.8);
             }
             100% {
                 opacity: 1;
-                transform: rotateY(360deg) rotateX(-5deg) scale(1);
+                transform: scale(1);
             }
         }
         
-        .logo-3d-wrapper {
-            animation: logoEntry 1s ease-out, rotateY360 4s linear 1s infinite;
-            /* Entry animation first, then continuous rotation */
+        .logo-gif {
+            animation: logoEntry 1s ease-out;
         }
     </style>
     
@@ -192,21 +150,16 @@
 </head>
 <body class="antialiased min-h-screen flex items-center justify-center bg-gray-dark">
     <div class="w-full max-w-md mx-auto p-4">
-        <!-- 3D Rotating Logo -->
+        <!-- GIF Logo -->
         <div class="flex justify-center mb-6">
-            <a href="{{ url('/') }}" class="logo-3d-container">
-                <div class="logo-3d-wrapper">
-                    <!-- Glow effect behind logo -->
-                    <div class="logo-glow"></div>
-                    
-                    <!-- Main logo -->
-                    <img src="{{ asset('assets/images/logo.svg') }}" 
-                         alt="Made in China" 
-                         class="logo-3d">
-                    
-                    <!-- Reflection effect -->
-                    <div class="logo-reflection"></div>
-                </div>
+            <a href="{{ url('/') }}" class="logo-gif-container">
+                <!-- Glow effect behind logo -->
+                <div class="logo-glow"></div>
+                
+                <!-- Main logo GIF -->
+                <img src="{{ asset('assets/images/logo.gif') }}" 
+                     alt="Made in China" 
+                     class="logo-gif">
             </a>
         </div>
         
