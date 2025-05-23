@@ -12,7 +12,7 @@
 @section('auth-content')
     <!-- Error Messages -->
     @if ($errors->any())
-    <div class="mb-6 p-4 rounded-lg border text-center bg-red-900 text-red-200 border-red-700">
+    <div class="mb-4 p-3 rounded-lg border text-center text-sm bg-red-900 text-red-200 border-red-700 text-sm">
         <ul class="list-none p-0 m-0 space-y-1">
             @foreach ($errors->all() as $error)
             <li>{{ $error }}</li>
@@ -26,14 +26,14 @@
         
         <div class="mb-6">
             <label for="email" class="block text-sm font-medium text-white mb-2">
-                <i class="ri-mail-line mr-2"></i>Email
+            Email
             </label>
             <input id="email" 
                    type="email" 
                    name="email" 
                    value="{{ old('email') }}" 
                    class="form-input @error('email') border-red-700 @enderror"
-                   placeholder="admin@example.com" 
+                   placeholder="votre@email.com" 
                    required 
                    autofocus>
         </div>
