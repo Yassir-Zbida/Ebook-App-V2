@@ -232,13 +232,13 @@ class AuthController extends Controller
         $request->validate([
             'token' => 'required',
             'email' => 'required|email',
-            'password' => 'required|min:8|confirmed',
+            'password' => 'required|min:6|confirmed',
         ], [
             'token.required' => 'Le jeton de réinitialisation est requis.',
             'email.required' => 'L\'adresse email est obligatoire.',
             'email.email' => 'Veuillez entrer une adresse email valide.',
             'password.required' => 'Le nouveau mot de passe est obligatoire.',
-            'password.min' => 'Le mot de passe doit contenir au moins 8 caractères.',
+            'password.min' => 'Le mot de passe doit contenir au moins 6 caractères.',
             'password.confirmed' => 'Les mots de passe ne correspondent pas.',
         ]);
 
@@ -278,11 +278,11 @@ class AuthController extends Controller
     {
         $validator = Validator::make($request->all(), [
             'current_password' => 'required',
-            'password' => 'required|min:8|confirmed',
+            'password' => 'required|min:6|confirmed',
         ], [
             'current_password.required' => 'Le mot de passe actuel est obligatoire.',
             'password.required' => 'Le nouveau mot de passe est obligatoire.',
-            'password.min' => 'Le nouveau mot de passe doit contenir au moins 8 caractères.',
+            'password.min' => 'Le nouveau mot de passe doit contenir au moins 6 caractères.',
             'password.confirmed' => 'Les nouveaux mots de passe ne correspondent pas.',
         ]);
 

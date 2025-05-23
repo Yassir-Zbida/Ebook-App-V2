@@ -6,6 +6,8 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
+use App\Mail\ResetPasswordMail;
+use Illuminate\Support\Facades\Mail;
 
 class User extends Authenticatable
 {
@@ -70,8 +72,8 @@ class User extends Authenticatable
     public function purchasedEbooks()
     {
         return $this->belongsToMany(Ebook::class, 'user_ebooks')
-                    ->withPivot('purchase_price', 'purchased_at')
-                    ->withTimestamps();
+            ->withPivot('purchase_price', 'purchased_at')
+            ->withTimestamps();
     }
 
     /**
@@ -88,9 +90,9 @@ class User extends Authenticatable
     public function getPurchaseHistory()
     {
         return $this->purchasedEbooks()
-                    ->withPivot('purchase_price', 'purchased_at')
-                    ->orderBy('user_ebooks.purchased_at', 'desc')
-                    ->get();
+            ->withPivot('purchase_price', 'purchased_at')
+            ->orderBy('user_ebooks.purchased_at', 'desc')
+            ->get();
     }
 
     /**
@@ -132,6 +134,9 @@ class User extends Authenticatable
     {
         return ucfirst($this->role);
     }
-
     
+    public function sendPasswordResetNotification($token)
+    {
+        Mail::to($this->email)->send(new ResetPasswordMail($token, $this->email, $this));
+    }
 }

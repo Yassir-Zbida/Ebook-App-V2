@@ -86,11 +86,17 @@ Connectez-vous à votre compte pour continuer
 
 <script>
     document.addEventListener('DOMContentLoaded', function() {
-        // Password visibility toggle
+        // Get all form elements
+        const loginForm = document.querySelector('form');
+        const emailInput = document.getElementById('email');
         const passwordInput = document.getElementById('password');
+        const submitButton = loginForm.querySelector('button[type="submit"]');
         const togglePassword = document.getElementById('togglePassword');
         const passwordIcon = document.getElementById('passwordIcon');
+        const toggleCheckbox = document.getElementById('remember');
+        const toggleBg = document.querySelector('.toggle-bg');
 
+        // Password visibility toggle
         togglePassword.addEventListener('click', function() {
             const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
             passwordInput.setAttribute('type', type);
@@ -105,22 +111,11 @@ Connectez-vous à votre compte pour continuer
         });
 
         // Enhanced toggle switch with professional behavior
-        const toggleCheckbox = document.getElementById('remember');
-        const toggleBg = document.querySelector('.toggle-bg');
-
         toggleCheckbox.addEventListener('change', function() {
             // Add a subtle scale effect when toggling
             toggleBg.style.transform = 'scale(1.05)';
             setTimeout(() => toggleBg.style.transform = 'scale(1)', 150);
         });
-    });
-
-    document.addEventListener('DOMContentLoaded', function() {
-        // Get form elements
-        const loginForm = document.querySelector('form');
-        const emailInput = document.getElementById('email');
-        const passwordInput = document.getElementById('password');
-        const submitButton = loginForm.querySelector('button[type="submit"]');
 
         // Validation messages in French
         const messages = {
@@ -252,32 +247,6 @@ Connectez-vous à votre compte pour continuer
                     passwordInput.focus();
                 }
             }
-        });
-
-        // Existing password visibility toggle code
-        const togglePassword = document.getElementById('togglePassword');
-        const passwordIcon = document.getElementById('passwordIcon');
-
-        togglePassword.addEventListener('click', function() {
-            const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
-            passwordInput.setAttribute('type', type);
-
-            if (type === 'text') {
-                passwordIcon.classList.remove('ri-eye-line');
-                passwordIcon.classList.add('ri-eye-off-line');
-            } else {
-                passwordIcon.classList.remove('ri-eye-off-line');
-                passwordIcon.classList.add('ri-eye-line');
-            }
-        });
-
-        // Existing toggle switch code
-        const toggleCheckbox = document.getElementById('remember');
-        const toggleBg = document.querySelector('.toggle-bg');
-
-        toggleCheckbox.addEventListener('change', function() {
-            toggleBg.style.transform = 'scale(1.05)';
-            setTimeout(() => toggleBg.style.transform = 'scale(1)', 150);
         });
     });
 
