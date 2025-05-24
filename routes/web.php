@@ -34,3 +34,9 @@ Route::middleware(['role'])->group(function () {
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
     
 });
+
+// Admin routes
+Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->group(function () {
+    // Ebook management
+    Route::resource('ebooks', \App\Http\Controllers\Admin\EbookController::class);
+});

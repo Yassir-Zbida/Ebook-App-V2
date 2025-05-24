@@ -187,9 +187,8 @@
                             <i x-show="sidebarOpen" :class="open ? 'rotate-90' : ''" class="ri-arrow-right-s-line transition-transform text-lg"></i>
                         </button>
                         <div x-show="open && sidebarOpen" x-collapse class="mt-2 ml-12 space-y-1">
-                            <a href="#" class="block px-4 py-2.5 text-sm text-gray-600 dark:text-gray-light hover:text-primary dark:hover:text-primary-light">Tous les livres</a>
-                            <a href="#" class="block px-4 py-2.5 text-sm text-gray-600 dark:text-gray-light hover:text-primary dark:hover:text-primary-light">Catégories</a>
-                            <a href="#" class="block px-4 py-2.5 text-sm text-gray-600 dark:text-gray-light hover:text-primary dark:hover:text-primary-light">Auteurs</a>
+                            <a href="{{ route('admin.ebooks.index') }}" class="block px-4 py-2.5 text-sm text-gray-600 dark:text-gray-light hover:text-primary dark:hover:text-primary-light">Tous les ebooks</a>
+                            <a href="{{ route('admin.ebooks.create') }}" class="block px-4 py-2.5 text-sm text-gray-600 dark:text-gray-light hover:text-primary dark:hover:text-primary-light">Ajouter un ebook</a>
                         </div>
                     </div>
                     
