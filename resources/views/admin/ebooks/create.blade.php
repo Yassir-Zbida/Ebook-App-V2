@@ -122,7 +122,7 @@
                 <textarea name="categories[INDEX].description" class="form-input form-input-sm" rows="2"></textarea>
             </div>
         </div>
-        <div class="collapsible-children transition-all duration-300 ease-in-out overflow-hidden" style="max-height: 1000px;">
+        <div class="collapsible-children transition-all duration-300 ease-in-out overflow-hidden">
             <!-- Subcategories Container -->
             <div class="subcategories-container space-y-2 ml-6 border-l-2 border-gray-200 dark:border-gray-700 pl-3">
                 <!-- Subcategories will be added here dynamically -->
@@ -172,8 +172,7 @@
                 <select name="categories[CATEGORY_INDEX].resource.content_type" 
                         class="form-input" onchange="handleContentTypeChange(this)" required>
                     <option value="pdf">PDF Document</option>
-                    <option value="image">Image</option>
-                    <option value="table">Table Data</option>
+                    <option value="excel">Excel File</option>
                 </select>
             </div>
             <div class="md:col-span-2">
@@ -184,57 +183,11 @@
 
         <!-- Dynamic Content Based on Type -->
         <div class="content-container">
-            <!-- File Upload for PDF/Image -->
-            <div class="file-upload-container hidden">
+            <!-- File Upload for PDF/Excel -->
+            <div class="file-upload-container">
                 <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">File</label>
                 <input type="file" name="categories[CATEGORY_INDEX].resource.file" 
-                       class="form-input" accept=".pdf,image/*">
-            </div>
-
-            <!-- Table Data Input -->
-            <div class="table-data-container hidden">
-                <div class="space-y-4">
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Company Name</label>
-                        <input type="text" name="categories[CATEGORY_INDEX].resource.table_data[company_name]" class="form-input" required>
-                    </div>
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Contact Person</label>
-                        <input type="text" name="categories[CATEGORY_INDEX].resource.table_data[contact_person]" class="form-input">
-                    </div>
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Email</label>
-                        <input type="email" name="categories[CATEGORY_INDEX].resource.table_data[email]" class="form-input">
-                    </div>
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Phone</label>
-                        <input type="text" name="categories[CATEGORY_INDEX].resource.table_data[phone]" class="form-input">
-                    </div>
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Address</label>
-                        <textarea name="categories[CATEGORY_INDEX].resource.table_data[address]" class="form-input" rows="2"></textarea>
-                    </div>
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Website</label>
-                        <input type="url" name="categories[CATEGORY_INDEX].resource.table_data[website]" class="form-input">
-                    </div>
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Specialization</label>
-                        <input type="text" name="categories[CATEGORY_INDEX].resource.table_data[specialization]" class="form-input">
-                    </div>
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Minimum Order</label>
-                        <input type="text" name="categories[CATEGORY_INDEX].resource.table_data[min_order]" class="form-input">
-                    </div>
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Payment Terms</label>
-                        <input type="text" name="categories[CATEGORY_INDEX].resource.table_data[payment_terms]" class="form-input">
-                    </div>
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Notes</label>
-                        <textarea name="categories[CATEGORY_INDEX].resource.table_data[notes]" class="form-input" rows="2"></textarea>
-                    </div>
-                </div>
+                       class="form-input" accept=".pdf,.xlsx,.xls" required>
             </div>
         </div>
     </div>
@@ -248,9 +201,13 @@
 .collapse-btn.collapsed .ri-arrow-down-s-line {
     transform: rotate(-90deg);
 }
+.collapsible-children {
+    max-height: none;
+    transition: max-height 0.3s ease-in-out, opacity 0.3s ease-in-out;
+}
 .collapsible-children.collapsed {
     max-height: 0 !important;
-    opacity: 0.5;
+    opacity: 0;
     pointer-events: none;
 }
 .form-input-sm {
@@ -384,15 +341,15 @@ function removeResource(button) {
 }
 
 function handleContentTypeChange(select) {
+    // Since we only have file uploads now (PDF/Excel), no need to toggle containers
     const resourceItem = select.closest('.resource-item');
-    const fileContainer = resourceItem.querySelector('.file-upload-container');
-    const tableContainer = resourceItem.querySelector('.table-data-container');
-    fileContainer.classList.add('hidden');
-    tableContainer.classList.add('hidden');
-    if (select.value === 'table') {
-        tableContainer.classList.remove('hidden');
-    } else {
-        fileContainer.classList.remove('hidden');
+    const fileInput = resourceItem.querySelector('input[type="file"]');
+    
+    // Update file input accept attribute based on selection
+    if (select.value === 'pdf') {
+        fileInput.accept = '.pdf';
+    } else if (select.value === 'excel') {
+        fileInput.accept = '.xlsx,.xls';
     }
 }
 
