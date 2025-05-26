@@ -1,95 +1,119 @@
 @extends('layouts.app')
 
 @section('title', 'Tableau de bord')
-@section('page-title', 'Vue d\'ensemble')
+@section('page-title', 'Tableau de bord')
 
 @section('content')
 <div class="space-y-8">
     <!-- Welcome Section -->
-    <div class="bg-gradient-to-r from-primary to-primary-light p-8 rounded-2xl shadow-xl">
-        <div class="flex flex-col md:flex-row md:items-center md:justify-between">
-            <div>
-                <h2 class="text-3xl font-bold text-white mb-3">Bonjour, {{ auth()->user()->name ?? 'Admin' }}! 👋</h2>
-                <p class="text-purple-100 text-lg">Bienvenue dans votre tableau de bord. Voici ce qui se passe aujourd'hui.</p>
-            </div>
-            <div class="mt-6 md:mt-0">
-                <div class="flex items-center space-x-4 bg-white/20 backdrop-blur-sm rounded-xl p-6">
-                    <i class="ri-vip-crown-line text-yellow-300 text-3xl"></i>
-                    <div>
-                        <p class="text-white font-medium">Passez à un plan supérieur</p>
-                        <p class="text-purple-100 text-sm">pour débloquer des fonctionnalités avancées</p>
+    <div id="welcome-banner" class="bg-gradient-to-r from-primary to-primary-light p-8 rounded-2xl shadow-xl relative overflow-hidden">
+        <!-- Close Button with better positioning -->
+        <button id="close-banner" type="button" class="absolute top-4 right-4 text-white p-2 rounded-full focus:outline-none transition-all duration-200 z-20">
+            <i class="ri-close-line text-2xl hover:text-white hover:bg-red-700 p-2 rounded-full"></i>
+        </button>
+
+        <!-- Background decoration -->
+        <div class="absolute top-0 right-0 w-64 h-64 bg-white/10 rounded-full -translate-y-32 translate-x-32"></div>
+        <div class="absolute bottom-0 left-0 w-48 h-48 bg-white/5 rounded-full translate-y-24 -translate-x-24"></div>
+
+        <div class="relative z-10">
+            <div class="mb-6">
+                <h2 class="text-3xl lg:text-4xl font-bold text-white mb-3">
+                    Bonjour, {{ auth()->user()->name ?? 'Admin' }}! 👋
+                </h2>
+                <p class="text-purple-100 text-lg lg:text-xl max-w-2xl">
+                    Bienvenue dans votre tableau de bord. Voici ce qui se passe aujourd'hui.
+                </p>
+                <div class="mt-4 flex items-center space-x-4 text-purple-100">
+                    <div class="flex items-center space-x-2">
+                        <i class="ri-calendar-line text-lg"></i>
+                        <span>{{ now()->format('d M Y') }}</span>
                     </div>
-                    <button class="ml-6 bg-white text-primary-dark px-6 py-3 rounded-xl font-semibold hover:bg-gray-100 transition-all duration-200 shadow-lg">
-                        Choisir un plan
-                    </button>
+                    <div class="flex items-center space-x-2">
+                        <i class="ri-time-line text-lg"></i>
+                        <span id="current-time">{{ now()->format('H:i:s') }}</span>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
-    
+
+
     <!-- Stats Grid -->
     <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-6">
         <!-- Total des ventes -->
-        <div class="bg-white dark:bg-gray-dark border border-gray-200 dark:border-gray-soft rounded-2xl p-6 card-shadow hover:scale-105 transition-transform duration-200">
+        <div class="bg-white dark:bg-gray-dark border border-gray-200 dark:border-gray-soft rounded-2xl p-6 card-shadow hover:scale-105 transition-all duration-300 group">
             <div class="flex items-start justify-between mb-6">
-                <div class="w-14 h-14 bg-gradient-to-br from-purple-500 to-purple-600 rounded-xl flex items-center justify-center shadow-lg">
+                <div class="w-14 h-14 bg-gradient-to-br from-purple-500 to-purple-600 rounded-xl flex items-center justify-center shadow-lg group-hover:shadow-xl transition-shadow duration-300">
                     <i class="ri-shopping-cart-2-line text-white text-2xl"></i>
                 </div>
                 <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-green-100 text-green-800 dark:bg-green-900/20 dark:text-green-400">
-                    <i class="ri-arrow-up-line mr-1"></i> 432
+                    <i class="ri-arrow-up-line mr-1"></i> +432
                 </span>
             </div>
             <h3 class="text-gray-600 dark:text-gray-light text-sm font-medium mb-2">Total des ventes</h3>
             <p class="text-3xl font-bold text-gray-800 dark:text-white mb-1">5 094</p>
             <p class="text-sm text-gray-500 dark:text-gray-light">Depuis 732 (7 derniers jours)</p>
+            <div class="mt-4 w-full bg-gray-200 dark:bg-gray-soft rounded-full h-2">
+                <div class="bg-gradient-to-r from-purple-500 to-purple-600 h-2 rounded-full" style="width: 75%"></div>
+            </div>
         </div>
-        
+
         <!-- Revenus -->
-        <div class="bg-white dark:bg-gray-dark border border-gray-200 dark:border-gray-soft rounded-2xl p-6 card-shadow hover:scale-105 transition-transform duration-200">
+        <div class="bg-white dark:bg-gray-dark border border-gray-200 dark:border-gray-soft rounded-2xl p-6 card-shadow hover:scale-105 transition-all duration-300 group">
             <div class="flex items-start justify-between mb-6">
-                <div class="w-14 h-14 bg-gradient-to-br from-green-500 to-green-600 rounded-xl flex items-center justify-center shadow-lg">
+                <div class="w-14 h-14 bg-gradient-to-br from-green-500 to-green-600 rounded-xl flex items-center justify-center shadow-lg group-hover:shadow-xl transition-shadow duration-300">
                     <i class="ri-money-dollar-circle-line text-white text-2xl"></i>
                 </div>
                 <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-green-100 text-green-800 dark:bg-green-900/20 dark:text-green-400">
-                    <i class="ri-arrow-up-line mr-1"></i> 2,4%
+                    <i class="ri-arrow-up-line mr-1"></i> +2,4%
                 </span>
             </div>
             <h3 class="text-gray-600 dark:text-gray-light text-sm font-medium mb-2">Revenus</h3>
             <p class="text-3xl font-bold text-gray-800 dark:text-white mb-1">387 542 €</p>
             <p class="text-sm text-gray-500 dark:text-gray-light">24 Sep 2024</p>
+            <div class="mt-4 w-full bg-gray-200 dark:bg-gray-soft rounded-full h-2">
+                <div class="bg-gradient-to-r from-green-500 to-green-600 h-2 rounded-full" style="width: 85%"></div>
+            </div>
         </div>
-        
+
         <!-- Utilisateurs actifs -->
-        <div class="bg-white dark:bg-gray-dark border border-gray-200 dark:border-gray-soft rounded-2xl p-6 card-shadow hover:scale-105 transition-transform duration-200">
+        <div class="bg-white dark:bg-gray-dark border border-gray-200 dark:border-gray-soft rounded-2xl p-6 card-shadow hover:scale-105 transition-all duration-300 group">
             <div class="flex items-start justify-between mb-6">
-                <div class="w-14 h-14 bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl flex items-center justify-center shadow-lg">
+                <div class="w-14 h-14 bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl flex items-center justify-center shadow-lg group-hover:shadow-xl transition-shadow duration-300">
                     <i class="ri-user-line text-white text-2xl"></i>
                 </div>
                 <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-green-100 text-green-800 dark:bg-green-900/20 dark:text-green-400">
-                    <i class="ri-arrow-up-line mr-1"></i> 345
+                    <i class="ri-arrow-up-line mr-1"></i> +345
                 </span>
             </div>
             <h3 class="text-gray-600 dark:text-gray-light text-sm font-medium mb-2">Utilisateurs actifs</h3>
             <p class="text-3xl font-bold text-gray-800 dark:text-white mb-1">2 412</p>
             <p class="text-sm text-gray-500 dark:text-gray-light">Depuis 732 (7 derniers jours)</p>
+            <div class="mt-4 w-full bg-gray-200 dark:bg-gray-soft rounded-full h-2">
+                <div class="bg-gradient-to-r from-blue-500 to-blue-600 h-2 rounded-full" style="width: 65%"></div>
+            </div>
         </div>
-        
+
         <!-- Taux de conversion -->
-        <div class="bg-white dark:bg-gray-dark border border-gray-200 dark:border-gray-soft rounded-2xl p-6 card-shadow hover:scale-105 transition-transform duration-200">
+        <div class="bg-white dark:bg-gray-dark border border-gray-200 dark:border-gray-soft rounded-2xl p-6 card-shadow hover:scale-105 transition-all duration-300 group">
             <div class="flex items-start justify-between mb-6">
-                <div class="w-14 h-14 bg-gradient-to-br from-orange-500 to-orange-600 rounded-xl flex items-center justify-center shadow-lg">
+                <div class="w-14 h-14 bg-gradient-to-br from-orange-500 to-orange-600 rounded-xl flex items-center justify-center shadow-lg group-hover:shadow-xl transition-shadow duration-300">
                     <i class="ri-percent-line text-white text-2xl"></i>
                 </div>
                 <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-red-100 text-red-800 dark:bg-red-900/20 dark:text-red-400">
-                    <i class="ri-arrow-down-line mr-1"></i> 0,6%
+                    <i class="ri-arrow-down-line mr-1"></i> -0,6%
                 </span>
             </div>
             <h3 class="text-gray-600 dark:text-gray-light text-sm font-medium mb-2">Taux de conversion</h3>
             <p class="text-3xl font-bold text-gray-800 dark:text-white mb-1">85%</p>
             <p class="text-sm text-gray-500 dark:text-gray-light">Depuis 732 (7 derniers jours)</p>
+            <div class="mt-4 w-full bg-gray-200 dark:bg-gray-soft rounded-full h-2">
+                <div class="bg-gradient-to-r from-orange-500 to-orange-600 h-2 rounded-full" style="width: 85%"></div>
+            </div>
         </div>
     </div>
-    
+
     <!-- Main Content Grid -->
     <div class="grid grid-cols-1 xl:grid-cols-3 gap-8">
         <!-- Revenue Chart -->
@@ -99,144 +123,261 @@
                     <h3 class="text-xl font-bold text-gray-800 dark:text-white mb-2">Aperçu des revenus</h3>
                     <p class="text-gray-600 dark:text-gray-light">Performance mensuelle des revenus</p>
                 </div>
-                <select class="mt-4 sm:mt-0 bg-gray-100 dark:bg-gray-soft border border-gray-200 dark:border-gray-soft rounded-xl px-4 py-3 text-sm text-gray-800 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary cursor-pointer">
-                    <option>Année dernière</option>
-                    <option>6 derniers mois</option>
-                    <option>Mois dernier</option>
-                </select>
+                <div class="mt-4 sm:mt-0 flex items-center space-x-3">
+                    <!-- Custom Select -->
+                    <div class="relative" x-data="{ open: false, selected: 'Année dernière' }">
+                        <button @click="open = !open"
+                            class="bg-gray-100 dark:bg-gray-soft border border-gray-200 dark:border-gray-soft rounded-xl px-4 py-3 text-sm text-gray-800 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary cursor-pointer flex items-center justify-between min-w-[140px]">
+                            <span x-text="selected"></span>
+                            <i class="ri-arrow-down-s-line ml-2 transition-transform duration-200" :class="{ 'rotate-180': open }"></i>
+                        </button>
+                        <div x-show="open"
+                            @click.away="open = false"
+                            x-transition:enter="transition ease-out duration-200"
+                            x-transition:enter-start="opacity-0 scale-95"
+                            x-transition:enter-end="opacity-100 scale-100"
+                            x-transition:leave="transition ease-in duration-150"
+                            x-transition:leave-start="opacity-100 scale-100"
+                            x-transition:leave-end="opacity-0 scale-95"
+                            class="absolute top-full left-0 mt-2 w-full bg-white dark:bg-gray-dark border border-gray-200 dark:border-gray-soft rounded-xl shadow-lg z-10">
+                            <div class="py-2">
+                                <button @click="selected = 'Année dernière'; open = false"
+                                    class="w-full text-left px-4 py-2 text-sm text-gray-800 dark:text-white hover:bg-gray-100 dark:hover:bg-gray-soft transition-colors">
+                                    Année dernière
+                                </button>
+                                <button @click="selected = '6 derniers mois'; open = false"
+                                    class="w-full text-left px-4 py-2 text-sm text-gray-800 dark:text-white hover:bg-gray-100 dark:hover:bg-gray-soft transition-colors">
+                                    6 derniers mois
+                                </button>
+                                <button @click="selected = 'Mois dernier'; open = false"
+                                    class="w-full text-left px-4 py-2 text-sm text-gray-800 dark:text-white hover:bg-gray-100 dark:hover:bg-gray-soft transition-colors">
+                                    Mois dernier
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    <button class="p-3 bg-gray-100 dark:bg-gray-soft hover:bg-gray-200 dark:hover:bg-gray-medium rounded-xl transition-colors">
+                        <i class="ri-download-line text-gray-600 dark:text-gray-light"></i>
+                    </button>
+                </div>
             </div>
-            
+
             <div class="mb-6">
                 <p class="text-4xl font-bold text-gray-800 dark:text-white mb-2">14 020 110 €</p>
                 <p class="text-gray-600 dark:text-gray-light">Vous avez gagné <span class="text-green-600 dark:text-green-400 font-semibold">+420,00 €</span> ce mois-ci</p>
             </div>
-            
+
             <div class="h-80">
                 <canvas id="revenueChart"></canvas>
             </div>
         </div>
-        
+
         <!-- Right Column -->
         <div class="space-y-8">
             <!-- Activités récentes -->
             <div class="bg-white dark:bg-gray-dark border border-gray-200 dark:border-gray-soft rounded-2xl p-6 card-shadow">
                 <div class="flex items-center justify-between mb-6">
                     <h3 class="text-lg font-bold text-gray-800 dark:text-white">Activités récentes</h3>
-                    <a href="#" class="text-sm font-medium text-primary hover:text-primary-dark transition-colors">Voir tout →</a>
+                    <a href="#" class="text-sm font-medium text-primary hover:text-primary-dark transition-colors flex items-center space-x-1">
+                        <span>Voir tout</span>
+                        <i class="ri-arrow-right-line"></i>
+                    </a>
                 </div>
-                
+
                 <div class="space-y-4">
-                    <div class="flex items-start space-x-4 p-3 rounded-xl hover:bg-gray-50 dark:hover:bg-gray-soft transition-colors">
+                    <div class="flex items-start space-x-4 p-3 rounded-xl hover:bg-gray-50 dark:hover:bg-gray-soft transition-colors group">
                         <div class="relative">
-                            <img src="https://ui-avatars.com/api/?name=David+Elson&background=8622c7&color=fff" alt="David Elson" class="w-12 h-12 rounded-xl">
-                            <div class="absolute -bottom-1 -right-1 w-5 h-5 bg-purple-500 rounded-full flex items-center justify-center">
+                            <img src="https://ui-avatars.com/api/?name=David+Elson&background=8622c7&color=fff" alt="David Elson" class="w-12 h-12 rounded-xl shadow-md">
+                            <div class="absolute -bottom-1 -right-1 w-5 h-5 bg-purple-500 rounded-full flex items-center justify-center shadow-lg">
                                 <i class="ri-heart-fill text-white text-xs"></i>
                             </div>
                         </div>
                         <div class="flex-1">
-                            <p class="text-gray-800 dark:text-white font-medium">David Elson <span class="font-normal text-gray-600 dark:text-gray-light">a ajouté votre ebook aux favoris</span></p>
-                            <p class="text-sm text-gray-500 dark:text-gray-light mt-1">Il y a 6 min</p>
+                            <p class="text-gray-800 dark:text-white font-medium">
+                                <span class="font-semibold">David Elson</span>
+                                <span class="font-normal text-gray-600 dark:text-gray-light">a ajouté votre ebook aux favoris</span>
+                            </p>
+                            <p class="text-sm text-gray-500 dark:text-gray-light mt-1 flex items-center space-x-1">
+                                <i class="ri-time-line text-xs"></i>
+                                <span>Il y a 6 min</span>
+                            </p>
                         </div>
                     </div>
-                    
-                    <div class="flex items-start space-x-4 p-3 rounded-xl hover:bg-gray-50 dark:hover:bg-gray-soft transition-colors">
+
+                    <div class="flex items-start space-x-4 p-3 rounded-xl hover:bg-gray-50 dark:hover:bg-gray-soft transition-colors group">
                         <div class="relative">
-                            <img src="https://ui-avatars.com/api/?name=Kurt+Bates&background=ef4444&color=fff" alt="Kurt Bates" class="w-12 h-12 rounded-xl">
-                            <div class="absolute -bottom-1 -right-1 w-5 h-5 bg-green-500 rounded-full flex items-center justify-center">
+                            <img src="https://ui-avatars.com/api/?name=Kurt+Bates&background=ef4444&color=fff" alt="Kurt Bates" class="w-12 h-12 rounded-xl shadow-md">
+                            <div class="absolute -bottom-1 -right-1 w-5 h-5 bg-green-500 rounded-full flex items-center justify-center shadow-lg">
                                 <i class="ri-shopping-cart-fill text-white text-xs"></i>
                             </div>
                         </div>
                         <div class="flex-1">
-                            <p class="text-gray-800 dark:text-white font-medium">Kurt Bates <span class="font-normal text-gray-600 dark:text-gray-light">a acheté votre produit</span></p>
-                            <p class="text-sm text-gray-500 dark:text-gray-light mt-1">Il y a 16 min</p>
+                            <p class="text-gray-800 dark:text-white font-medium">
+                                <span class="font-semibold">Kurt Bates</span>
+                                <span class="font-normal text-gray-600 dark:text-gray-light">a acheté votre produit</span>
+                            </p>
+                            <p class="text-sm text-gray-500 dark:text-gray-light mt-1 flex items-center space-x-1">
+                                <i class="ri-time-line text-xs"></i>
+                                <span>Il y a 16 min</span>
+                            </p>
                         </div>
                     </div>
-                    
-                    <div class="flex items-start space-x-4 p-3 rounded-xl hover:bg-gray-50 dark:hover:bg-gray-soft transition-colors">
+
+                    <div class="flex items-start space-x-4 p-3 rounded-xl hover:bg-gray-50 dark:hover:bg-gray-soft transition-colors group">
                         <div class="relative">
-                            <img src="https://ui-avatars.com/api/?name=Eddie+Lake&background=3b82f6&color=fff" alt="Eddie Lake" class="w-12 h-12 rounded-xl">
-                            <div class="absolute -bottom-1 -right-1 w-5 h-5 bg-purple-500 rounded-full flex items-center justify-center">
+                            <img src="https://ui-avatars.com/api/?name=Eddie+Lake&background=3b82f6&color=fff" alt="Eddie Lake" class="w-12 h-12 rounded-xl shadow-md">
+                            <div class="absolute -bottom-1 -right-1 w-5 h-5 bg-purple-500 rounded-full flex items-center justify-center shadow-lg">
                                 <i class="ri-heart-fill text-white text-xs"></i>
                             </div>
                         </div>
                         <div class="flex-1">
-                            <p class="text-gray-800 dark:text-white font-medium">Eddie Lake <span class="font-normal text-gray-600 dark:text-gray-light">a ajouté votre ebook aux favoris</span></p>
-                            <p class="text-sm text-gray-500 dark:text-gray-light mt-1">Il y a 20 min</p>
+                            <p class="text-gray-800 dark:text-white font-medium">
+                                <span class="font-semibold">Eddie Lake</span>
+                                <span class="font-normal text-gray-600 dark:text-gray-light">a ajouté votre ebook aux favoris</span>
+                            </p>
+                            <p class="text-sm text-gray-500 dark:text-gray-light mt-1 flex items-center space-x-1">
+                                <i class="ri-time-line text-xs"></i>
+                                <span>Il y a 20 min</span>
+                            </p>
                         </div>
                     </div>
-                    
-                    <div class="flex items-start space-x-4 p-3 rounded-xl hover:bg-gray-50 dark:hover:bg-gray-soft transition-colors">
+
+                    <div class="flex items-start space-x-4 p-3 rounded-xl hover:bg-gray-50 dark:hover:bg-gray-soft transition-colors group">
                         <div class="relative">
-                            <img src="https://ui-avatars.com/api/?name=Patricia+Sanders&background=10b981&color=fff" alt="Patricia Sanders" class="w-12 h-12 rounded-xl">
-                            <div class="absolute -bottom-1 -right-1 w-5 h-5 bg-green-500 rounded-full flex items-center justify-center">
+                            <img src="https://ui-avatars.com/api/?name=Patricia+Sanders&background=10b981&color=fff" alt="Patricia Sanders" class="w-12 h-12 rounded-xl shadow-md">
+                            <div class="absolute -bottom-1 -right-1 w-5 h-5 bg-green-500 rounded-full flex items-center justify-center shadow-lg">
                                 <i class="ri-shopping-cart-fill text-white text-xs"></i>
                             </div>
                         </div>
                         <div class="flex-1">
-                            <p class="text-gray-800 dark:text-white font-medium">Patricia Sanders <span class="font-normal text-gray-600 dark:text-gray-light">a acheté votre produit</span></p>
-                            <p class="text-sm text-gray-500 dark:text-gray-light mt-1">Il y a 32 min</p>
+                            <p class="text-gray-800 dark:text-white font-medium">
+                                <span class="font-semibold">Patricia Sanders</span>
+                                <span class="font-normal text-gray-600 dark:text-gray-light">a acheté votre produit</span>
+                            </p>
+                            <p class="text-sm text-gray-500 dark:text-gray-light mt-1 flex items-center space-x-1">
+                                <i class="ri-time-line text-xs"></i>
+                                <span>Il y a 32 min</span>
+                            </p>
+                        </div>
+                    </div>
+
+                    <div class="flex items-start space-x-4 p-3 rounded-xl hover:bg-gray-50 dark:hover:bg-gray-soft transition-colors group">
+                        <div class="relative">
+                            <img src="https://ui-avatars.com/api/?name=Marie+Dubois&background=f59e0b&color=fff" alt="Marie Dubois" class="w-12 h-12 rounded-xl shadow-md">
+                            <div class="absolute -bottom-1 -right-1 w-5 h-5 bg-blue-500 rounded-full flex items-center justify-center shadow-lg">
+                                <i class="ri-star-fill text-white text-xs"></i>
+                            </div>
+                        </div>
+                        <div class="flex-1">
+                            <p class="text-gray-800 dark:text-white font-medium">
+                                <span class="font-semibold">Marie Dubois</span>
+                                <span class="font-normal text-gray-600 dark:text-gray-light">a laissé un avis 5 étoiles</span>
+                            </p>
+                            <p class="text-sm text-gray-500 dark:text-gray-light mt-1 flex items-center space-x-1">
+                                <i class="ri-time-line text-xs"></i>
+                                <span>Il y a 45 min</span>
+                            </p>
                         </div>
                     </div>
                 </div>
             </div>
-            
+
             <!-- Statistiques des produits -->
             <div class="bg-white dark:bg-gray-dark border border-gray-200 dark:border-gray-soft rounded-2xl p-6 card-shadow">
                 <div class="flex items-center justify-between mb-6">
                     <h3 class="text-lg font-bold text-gray-800 dark:text-white">Produits</h3>
-                    <a href="#" class="text-sm font-medium text-primary hover:text-primary-dark transition-colors">Voir tout →</a>
+                    <a href="#" class="text-sm font-medium text-primary hover:text-primary-dark transition-colors flex items-center space-x-1">
+                        <span>Voir tout</span>
+                        <i class="ri-arrow-right-line"></i>
+                    </a>
                 </div>
-                
+
                 <div class="space-y-4">
-                    <div class="flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-soft rounded-xl">
+                    <div class="flex items-center justify-between p-4 bg-gradient-to-r from-green-50 to-green-100 dark:from-green-900/20 dark:to-green-800/20 rounded-xl border border-green-200 dark:border-green-800/30">
                         <div class="flex items-center space-x-4">
-                            <div class="w-12 h-12 bg-green-100 dark:bg-green-900/20 rounded-xl flex items-center justify-center">
-                                <i class="ri-check-line text-green-600 dark:text-green-400 text-xl"></i>
+                            <div class="w-12 h-12 bg-green-500 rounded-xl flex items-center justify-center shadow-lg">
+                                <i class="ri-check-line text-white text-xl"></i>
                             </div>
                             <span class="text-gray-800 dark:text-white font-semibold">Annonces actives</span>
                         </div>
-                        <span class="text-3xl font-bold text-gray-800 dark:text-white">6</span>
+                        <span class="text-3xl font-bold text-green-600 dark:text-green-400">6</span>
                     </div>
-                    
-                    <div class="flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-soft rounded-xl">
+
+                    <div class="flex items-center justify-between p-4 bg-gradient-to-r from-yellow-50 to-yellow-100 dark:from-yellow-900/20 dark:to-yellow-800/20 rounded-xl border border-yellow-200 dark:border-yellow-800/30">
                         <div class="flex items-center space-x-4">
-                            <div class="w-12 h-12 bg-yellow-100 dark:bg-yellow-900/20 rounded-xl flex items-center justify-center">
-                                <i class="ri-time-line text-yellow-600 dark:text-yellow-400 text-xl"></i>
+                            <div class="w-12 h-12 bg-yellow-500 rounded-xl flex items-center justify-center shadow-lg">
+                                <i class="ri-time-line text-white text-xl"></i>
                             </div>
                             <span class="text-gray-800 dark:text-white font-semibold">Expirées</span>
                         </div>
-                        <span class="text-3xl font-bold text-gray-800 dark:text-white">2</span>
+                        <span class="text-3xl font-bold text-yellow-600 dark:text-yellow-400">2</span>
                     </div>
-                    
-                    <div class="flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-soft rounded-xl">
+
+                    <div class="flex items-center justify-between p-4 bg-gradient-to-r from-red-50 to-red-100 dark:from-red-900/20 dark:to-red-800/20 rounded-xl border border-red-200 dark:border-red-800/30">
                         <div class="flex items-center space-x-4">
-                            <div class="w-12 h-12 bg-red-100 dark:bg-red-900/20 rounded-xl flex items-center justify-center">
-                                <i class="ri-close-line text-red-600 dark:text-red-400 text-xl"></i>
+                            <div class="w-12 h-12 bg-red-500 rounded-xl flex items-center justify-center shadow-lg">
+                                <i class="ri-close-line text-white text-xl"></i>
                             </div>
                             <span class="text-gray-800 dark:text-white font-semibold">Épuisées</span>
                         </div>
-                        <span class="text-3xl font-bold text-gray-800 dark:text-white">5</span>
+                        <span class="text-3xl font-bold text-red-600 dark:text-red-400">5</span>
                     </div>
                 </div>
-                
-                <button class="mt-6 w-full bg-gradient-to-r from-primary to-primary-light hover:from-primary-dark hover:to-primary text-white font-semibold py-3 rounded-xl transition-all duration-200 shadow-lg hover:shadow-xl">
-                    <i class="ri-add-line text-lg mr-2"></i> Ajouter un nouvel ebook
+
+                <button class="mt-6 w-full bg-gradient-to-r from-primary to-primary-light hover:from-primary-dark hover:to-primary text-white font-semibold py-4 rounded-xl transition-all duration-200 shadow-lg hover:shadow-xl hover:scale-105 active:scale-95 flex items-center justify-center space-x-2">
+                    <i class="ri-add-line text-lg"></i>
+                    <span>Ajouter un nouvel ebook</span>
                 </button>
             </div>
         </div>
     </div>
-    
+
     <!-- Ebooks les plus vendus -->
     <div class="bg-white dark:bg-gray-dark border border-gray-200 dark:border-gray-soft rounded-2xl p-8 card-shadow">
         <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-8">
-            <h3 class="text-xl font-bold text-gray-800 dark:text-white">Ebooks les plus vendus</h3>
-            <select class="mt-4 sm:mt-0 bg-gray-100 dark:bg-gray-soft border border-gray-200 dark:border-gray-soft rounded-xl px-4 py-3 text-sm text-gray-800 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary cursor-pointer">
-                <option>Ce mois</option>
-                <option>Mois dernier</option>
-                <option>Tout le temps</option>
-            </select>
+            <div>
+                <h3 class="text-xl font-bold text-gray-800 dark:text-white mb-2">Ebooks les plus vendus</h3>
+                <p class="text-gray-600 dark:text-gray-light">Performances de vos meilleurs produits</p>
+            </div>
+            <div class="mt-4 sm:mt-0 flex items-center space-x-3">
+                <!-- Custom Select -->
+                <div class="relative" x-data="{ open: false, selected: 'Ce mois' }">
+                    <button @click="open = !open"
+                        class="bg-gray-100 dark:bg-gray-soft border border-gray-200 dark:border-gray-soft rounded-xl px-4 py-3 text-sm text-gray-800 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary cursor-pointer flex items-center justify-between min-w-[120px]">
+                        <span x-text="selected"></span>
+                        <i class="ri-arrow-down-s-line ml-2 transition-transform duration-200" :class="{ 'rotate-180': open }"></i>
+                    </button>
+                    <div x-show="open"
+                        @click.away="open = false"
+                        x-transition:enter="transition ease-out duration-200"
+                        x-transition:enter-start="opacity-0 scale-95"
+                        x-transition:enter-end="opacity-100 scale-100"
+                        x-transition:leave="transition ease-in duration-150"
+                        x-transition:leave-start="opacity-100 scale-100"
+                        x-transition:leave-end="opacity-0 scale-95"
+                        class="absolute top-full left-0 mt-2 w-full bg-white dark:bg-gray-dark border border-gray-200 dark:border-gray-soft rounded-xl shadow-lg z-10">
+                        <div class="py-2">
+                            <button @click="selected = 'Ce mois'; open = false"
+                                class="w-full text-left px-4 py-2 text-sm text-gray-800 dark:text-white hover:bg-gray-100 dark:hover:bg-gray-soft transition-colors">
+                                Ce mois
+                            </button>
+                            <button @click="selected = 'Mois dernier'; open = false"
+                                class="w-full text-left px-4 py-2 text-sm text-gray-800 dark:text-white hover:bg-gray-100 dark:hover:bg-gray-soft transition-colors">
+                                Mois dernier
+                            </button>
+                            <button @click="selected = 'Tout le temps'; open = false"
+                                class="w-full text-left px-4 py-2 text-sm text-gray-800 dark:text-white hover:bg-gray-100 dark:hover:bg-gray-soft transition-colors">
+                                Tout le temps
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                <button class="p-3 bg-gray-100 dark:bg-gray-soft hover:bg-gray-200 dark:hover:bg-gray-medium rounded-xl transition-colors">
+                    <i class="ri-download-line text-gray-600 dark:text-gray-light"></i>
+                </button>
+            </div>
         </div>
-        
+
         <div class="overflow-x-auto">
             <table class="w-full">
                 <thead>
@@ -251,10 +392,10 @@
                     </tr>
                 </thead>
                 <tbody class="divide-y divide-gray-200 dark:divide-gray-soft">
-                    <tr class="hover:bg-gray-50 dark:hover:bg-gray-soft/50 transition-colors">
+                    <tr class="hover:bg-gray-50 dark:hover:bg-gray-soft/50 transition-colors group">
                         <td class="py-5">
                             <div class="flex items-center space-x-4">
-                                <div class="w-12 h-16 bg-gradient-to-br from-purple-500 to-purple-600 rounded-lg flex items-center justify-center shadow-md">
+                                <div class="w-12 h-16 bg-gradient-to-br from-purple-500 to-purple-600 rounded-lg flex items-center justify-center shadow-md group-hover:shadow-lg transition-shadow">
                                     <i class="ri-book-2-fill text-white text-xl"></i>
                                 </div>
                                 <div>
@@ -264,20 +405,29 @@
                             </div>
                         </td>
                         <td class="py-5 text-gray-600 dark:text-gray-light">Jean Dupont</td>
-                        <td class="py-5 text-gray-600 dark:text-gray-light hidden lg:table-cell">Technologie</td>
+                        <td class="py-5 text-gray-600 dark:text-gray-light hidden lg:table-cell">
+                            <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800 dark:bg-blue-900/20 dark:text-blue-400">
+                                Technologie
+                            </span>
+                        </td>
                         <td class="py-5 text-gray-800 dark:text-white font-semibold">24,99 €</td>
                         <td class="py-5 text-gray-800 dark:text-white hidden sm:table-cell">1 234</td>
                         <td class="py-5 text-green-600 dark:text-green-400 font-bold">30 837,66 €</td>
                         <td class="py-5">
-                            <button class="p-2 hover:bg-gray-100 dark:hover:bg-gray-soft rounded-lg text-gray-600 dark:text-gray-light hover:text-gray-800 dark:hover:text-white transition-colors">
-                                <i class="ri-more-2-fill text-xl"></i>
-                            </button>
+                            <div class="flex items-center space-x-2">
+                                <button class="p-2 hover:bg-gray-100 dark:hover:bg-gray-soft rounded-lg text-gray-600 dark:text-gray-light hover:text-gray-800 dark:hover:text-white transition-colors">
+                                    <i class="ri-eye-line text-lg"></i>
+                                </button>
+                                <button class="p-2 hover:bg-gray-100 dark:hover:bg-gray-soft rounded-lg text-gray-600 dark:text-gray-light hover:text-gray-800 dark:hover:text-white transition-colors">
+                                    <i class="ri-more-2-fill text-lg"></i>
+                                </button>
+                            </div>
                         </td>
                     </tr>
-                    <tr class="hover:bg-gray-50 dark:hover:bg-gray-soft/50 transition-colors">
+                    <tr class="hover:bg-gray-50 dark:hover:bg-gray-soft/50 transition-colors group">
                         <td class="py-5">
                             <div class="flex items-center space-x-4">
-                                <div class="w-12 h-16 bg-gradient-to-br from-blue-500 to-blue-600 rounded-lg flex items-center justify-center shadow-md">
+                                <div class="w-12 h-16 bg-gradient-to-br from-blue-500 to-blue-600 rounded-lg flex items-center justify-center shadow-md group-hover:shadow-lg transition-shadow">
                                     <i class="ri-book-2-fill text-white text-xl"></i>
                                 </div>
                                 <div>
@@ -287,20 +437,29 @@
                             </div>
                         </td>
                         <td class="py-5 text-gray-600 dark:text-gray-light">Marie Martin</td>
-                        <td class="py-5 text-gray-600 dark:text-gray-light hidden lg:table-cell">Programmation</td>
+                        <td class="py-5 text-gray-600 dark:text-gray-light hidden lg:table-cell">
+                            <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800 dark:bg-green-900/20 dark:text-green-400">
+                                Programmation
+                            </span>
+                        </td>
                         <td class="py-5 text-gray-800 dark:text-white font-semibold">34,99 €</td>
                         <td class="py-5 text-gray-800 dark:text-white hidden sm:table-cell">892</td>
                         <td class="py-5 text-green-600 dark:text-green-400 font-bold">31 211,08 €</td>
                         <td class="py-5">
-                            <button class="p-2 hover:bg-gray-100 dark:hover:bg-gray-soft rounded-lg text-gray-600 dark:text-gray-light hover:text-gray-800 dark:hover:text-white transition-colors">
-                                <i class="ri-more-2-fill text-xl"></i>
-                            </button>
+                            <div class="flex items-center space-x-2">
+                                <button class="p-2 hover:bg-gray-100 dark:hover:bg-gray-soft rounded-lg text-gray-600 dark:text-gray-light hover:text-gray-800 dark:hover:text-white transition-colors">
+                                    <i class="ri-eye-line text-lg"></i>
+                                </button>
+                                <button class="p-2 hover:bg-gray-100 dark:hover:bg-gray-soft rounded-lg text-gray-600 dark:text-gray-light hover:text-gray-800 dark:hover:text-white transition-colors">
+                                    <i class="ri-more-2-fill text-lg"></i>
+                                </button>
+                            </div>
                         </td>
                     </tr>
-                    <tr class="hover:bg-gray-50 dark:hover:bg-gray-soft/50 transition-colors">
+                    <tr class="hover:bg-gray-50 dark:hover:bg-gray-soft/50 transition-colors group">
                         <td class="py-5">
                             <div class="flex items-center space-x-4">
-                                <div class="w-12 h-16 bg-gradient-to-br from-green-500 to-green-600 rounded-lg flex items-center justify-center shadow-md">
+                                <div class="w-12 h-16 bg-gradient-to-br from-green-500 to-green-600 rounded-lg flex items-center justify-center shadow-md group-hover:shadow-lg transition-shadow">
                                     <i class="ri-book-2-fill text-white text-xl"></i>
                                 </div>
                                 <div>
@@ -310,29 +469,200 @@
                             </div>
                         </td>
                         <td class="py-5 text-gray-600 dark:text-gray-light">Emma Bernard</td>
-                        <td class="py-5 text-gray-600 dark:text-gray-light hidden lg:table-cell">Écriture</td>
+                        <td class="py-5 text-gray-600 dark:text-gray-light hidden lg:table-cell">
+                            <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-purple-100 text-purple-800 dark:bg-purple-900/20 dark:text-purple-400">
+                                Écriture
+                            </span>
+                        </td>
                         <td class="py-5 text-gray-800 dark:text-white font-semibold">19,99 €</td>
                         <td class="py-5 text-gray-800 dark:text-white hidden sm:table-cell">1 567</td>
                         <td class="py-5 text-green-600 dark:text-green-400 font-bold">31 324,33 €</td>
                         <td class="py-5">
-                            <button class="p-2 hover:bg-gray-100 dark:hover:bg-gray-soft rounded-lg text-gray-600 dark:text-gray-light hover:text-gray-800 dark:hover:text-white transition-colors">
-                                <i class="ri-more-2-fill text-xl"></i>
-                            </button>
+                            <div class="flex items-center space-x-2">
+                                <button class="p-2 hover:bg-gray-100 dark:hover:bg-gray-soft rounded-lg text-gray-600 dark:text-gray-light hover:text-gray-800 dark:hover:text-white transition-colors">
+                                    <i class="ri-eye-line text-lg"></i>
+                                </button>
+                                <button class="p-2 hover:bg-gray-100 dark:hover:bg-gray-soft rounded-lg text-gray-600 dark:text-gray-light hover:text-gray-800 dark:hover:text-white transition-colors">
+                                    <i class="ri-more-2-fill text-lg"></i>
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+                    <tr class="hover:bg-gray-50 dark:hover:bg-gray-soft/50 transition-colors group">
+                        <td class="py-5">
+                            <div class="flex items-center space-x-4">
+                                <div class="w-12 h-16 bg-gradient-to-br from-red-500 to-red-600 rounded-lg flex items-center justify-center shadow-md group-hover:shadow-lg transition-shadow">
+                                    <i class="ri-book-2-fill text-white text-xl"></i>
+                                </div>
+                                <div>
+                                    <p class="text-gray-800 dark:text-white font-semibold">Marketing Digital</p>
+                                    <p class="text-sm text-gray-500 dark:text-gray-light lg:hidden">Business</p>
+                                </div>
+                            </div>
+                        </td>
+                        <td class="py-5 text-gray-600 dark:text-gray-light">Pierre Moreau</td>
+                        <td class="py-5 text-gray-600 dark:text-gray-light hidden lg:table-cell">
+                            <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-orange-100 text-orange-800 dark:bg-orange-900/20 dark:text-orange-400">
+                                Business
+                            </span>
+                        </td>
+                        <td class="py-5 text-gray-800 dark:text-white font-semibold">29,99 €</td>
+                        <td class="py-5 text-gray-800 dark:text-white hidden sm:table-cell">743</td>
+                        <td class="py-5 text-green-600 dark:text-green-400 font-bold">22 282,57 €</td>
+                        <td class="py-5">
+                            <div class="flex items-center space-x-2">
+                                <button class="p-2 hover:bg-gray-100 dark:hover:bg-gray-soft rounded-lg text-gray-600 dark:text-gray-light hover:text-gray-800 dark:hover:text-white transition-colors">
+                                    <i class="ri-eye-line text-lg"></i>
+                                </button>
+                                <button class="p-2 hover:bg-gray-100 dark:hover:bg-gray-soft rounded-lg text-gray-600 dark:text-gray-light hover:text-gray-800 dark:hover:text-white transition-colors">
+                                    <i class="ri-more-2-fill text-lg"></i>
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+                    <tr class="hover:bg-gray-50 dark:hover:bg-gray-soft/50 transition-colors group">
+                        <td class="py-5">
+                            <div class="flex items-center space-x-4">
+                                <div class="w-12 h-16 bg-gradient-to-br from-indigo-500 to-indigo-600 rounded-lg flex items-center justify-center shadow-md group-hover:shadow-lg transition-shadow">
+                                    <i class="ri-book-2-fill text-white text-xl"></i>
+                                </div>
+                                <div>
+                                    <p class="text-gray-800 dark:text-white font-semibold">Design UX/UI</p>
+                                    <p class="text-sm text-gray-500 dark:text-gray-light lg:hidden">Design</p>
+                                </div>
+                            </div>
+                        </td>
+                        <td class="py-5 text-gray-600 dark:text-gray-light">Sophie Laurent</td>
+                        <td class="py-5 text-gray-600 dark:text-gray-light hidden lg:table-cell">
+                            <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-pink-100 text-pink-800 dark:bg-pink-900/20 dark:text-pink-400">
+                                Design
+                            </span>
+                        </td>
+                        <td class="py-5 text-gray-800 dark:text-white font-semibold">39,99 €</td>
+                        <td class="py-5 text-gray-800 dark:text-white hidden sm:table-cell">521</td>
+                        <td class="py-5 text-green-600 dark:text-green-400 font-bold">20 839,79 €</td>
+                        <td class="py-5">
+                            <div class="flex items-center space-x-2">
+                                <button class="p-2 hover:bg-gray-100 dark:hover:bg-gray-soft rounded-lg text-gray-600 dark:text-gray-light hover:text-gray-800 dark:hover:text-white transition-colors">
+                                    <i class="ri-eye-line text-lg"></i>
+                                </button>
+                                <button class="p-2 hover:bg-gray-100 dark:hover:bg-gray-soft rounded-lg text-gray-600 dark:text-gray-light hover:text-gray-800 dark:hover:text-white transition-colors">
+                                    <i class="ri-more-2-fill text-lg"></i>
+                                </button>
+                            </div>
                         </td>
                     </tr>
                 </tbody>
             </table>
         </div>
+
+        <div class="mt-6 flex flex-col sm:flex-row sm:items-center sm:justify-between">
+            <p class="text-sm text-gray-600 dark:text-gray-light mb-4 sm:mb-0">
+                Affichage de 1 à 5 sur 47 résultats
+            </p>
+            <div class="flex items-center space-x-2">
+                <button class="px-3 py-2 text-sm font-medium text-gray-500 bg-white dark:bg-gray-dark border border-gray-300 dark:border-gray-soft rounded-lg hover:bg-gray-50 dark:hover:bg-gray-soft transition-colors">
+                    Précédent
+                </button>
+                <button class="px-3 py-2 text-sm font-medium text-white bg-primary border border-primary rounded-lg hover:bg-primary-dark transition-colors">
+                    1
+                </button>
+                <button class="px-3 py-2 text-sm font-medium text-gray-500 bg-white dark:bg-gray-dark border border-gray-300 dark:border-gray-soft rounded-lg hover:bg-gray-50 dark:hover:bg-gray-soft transition-colors">
+                    2
+                </button>
+                <button class="px-3 py-2 text-sm font-medium text-gray-500 bg-white dark:bg-gray-dark border border-gray-300 dark:border-gray-soft rounded-lg hover:bg-gray-50 dark:hover:bg-gray-soft transition-colors">
+                    3
+                </button>
+                <button class="px-3 py-2 text-sm font-medium text-gray-500 bg-white dark:bg-gray-dark border border-gray-300 dark:border-gray-soft rounded-lg hover:bg-gray-50 dark:hover:bg-gray-soft transition-colors">
+                    Suivant
+                </button>
+            </div>
+        </div>
     </div>
+
+    <!-- Quick Actions -->
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        <div class="bg-white dark:bg-gray-dark border border-gray-200 dark:border-gray-soft rounded-2xl p-6 card-shadow hover:scale-105 transition-all duration-300 group cursor-pointer">
+            <div class="flex items-center space-x-4">
+                <div class="w-12 h-12 bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl flex items-center justify-center shadow-lg group-hover:shadow-xl transition-shadow">
+                    <i class="ri-add-line text-white text-xl"></i>
+                </div>
+                <div>
+                    <h4 class="text-gray-800 dark:text-white font-semibold">Nouvel ebook</h4>
+                    <p class="text-sm text-gray-600 dark:text-gray-light">Ajouter un produit</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="bg-white dark:bg-gray-dark border border-gray-200 dark:border-gray-soft rounded-2xl p-6 card-shadow hover:scale-105 transition-all duration-300 group cursor-pointer">
+            <div class="flex items-center space-x-4">
+                <div class="w-12 h-12 bg-gradient-to-br from-green-500 to-green-600 rounded-xl flex items-center justify-center shadow-lg group-hover:shadow-xl transition-shadow">
+                    <i class="ri-megaphone-line text-white text-xl"></i>
+                </div>
+                <div>
+                    <h4 class="text-gray-800 dark:text-white font-semibold">Campagne</h4>
+                    <p class="text-sm text-gray-600 dark:text-gray-light">Créer une promo</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="bg-white dark:bg-gray-dark border border-gray-200 dark:border-gray-soft rounded-2xl p-6 card-shadow hover:scale-105 transition-all duration-300 group cursor-pointer">
+            <div class="flex items-center space-x-4">
+                <div class="w-12 h-12 bg-gradient-to-br from-purple-500 to-purple-600 rounded-xl flex items-center justify-center shadow-lg group-hover:shadow-xl transition-shadow">
+                    <i class="ri-bar-chart-line text-white text-xl"></i>
+                </div>
+                <div>
+                    <h4 class="text-gray-800 dark:text-white font-semibold">Rapport</h4>
+                    <p class="text-sm text-gray-600 dark:text-gray-light">Voir les stats</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="bg-white dark:bg-gray-dark border border-gray-200 dark:border-gray-soft rounded-2xl p-6 card-shadow hover:scale-105 transition-all duration-300 group cursor-pointer">
+            <div class="flex items-center space-x-4">
+                <div class="w-12 h-12 bg-gradient-to-br from-orange-500 to-orange-600 rounded-xl flex items-center justify-center shadow-lg group-hover:shadow-xl transition-shadow">
+                    <i class="ri-settings-3-line text-white text-xl"></i>
+                </div>
+                <div>
+                    <h4 class="text-gray-800 dark:text-white font-semibold">Paramètres</h4>
+                    <p class="text-sm text-gray-600 dark:text-gray-light">Configurer</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="mt-12 pt-8 border-t border-gray-200 dark:border-gray-soft">
+        <div class="text-center">
+            <p class="text-sm text-gray-500 dark:text-gray-light">
+                © {{ date('Y') }} <span class="font-semibold text-primary">Made in China eBooks</span>. Tous droits réservés.
+            </p>
+        </div>
+    </footer>
 </div>
 @endsection
 
 @push('scripts')
 <script>
-    // Revenue Chart with better styling
+    // Dynamic time update
+    function updateTime() {
+        const now = new Date();
+        const timeString = now.toLocaleTimeString('fr-FR', {
+            hour: '2-digit',
+            minute: '2-digit',
+            second: '2-digit'
+        });
+        document.getElementById('current-time').textContent = timeString;
+    }
+
+    // Update time immediately and then every second
+    updateTime();
+    setInterval(updateTime, 1000);
+
+    // Revenue Chart with enhanced styling and dark mode support
     const ctx = document.getElementById('revenueChart').getContext('2d');
-    
-    // Create gradient that works in both light and dark mode
+
+    // Create gradient that adapts to dark mode
     function createGradient() {
         const isDarkMode = document.documentElement.classList.contains('dark');
         const gradient = ctx.createLinearGradient(0, 0, 0, 350);
@@ -345,7 +675,7 @@
         }
         return gradient;
     }
-    
+
     const chartData = {
         labels: ['Jan', 'Fév', 'Mar', 'Avr', 'Mai', 'Juin', 'Juil', 'Août', 'Sep', 'Oct', 'Nov', 'Déc'],
         datasets: [{
@@ -365,7 +695,7 @@
             pointHoverBorderWidth: 4
         }]
     };
-    
+
     const chart = new Chart(ctx, {
         type: 'line',
         data: chartData,
@@ -384,7 +714,7 @@
                     bodyColor: '#e5e7eb',
                     borderColor: '#8622c7',
                     borderWidth: 2,
-                    cornerRadius: 10,
+                    cornerRadius: 12,
                     padding: 16,
                     titleFont: {
                         size: 14,
@@ -440,24 +770,119 @@
             }
         }
     });
-    
+
     // Update chart when dark mode changes
     const observer = new MutationObserver(function(mutations) {
         mutations.forEach(function(mutation) {
             if (mutation.type === 'attributes' && mutation.attributeName === 'class') {
                 // Update gradient
                 chart.data.datasets[0].backgroundColor = createGradient();
-                
+
                 // Update text colors
                 chart.options.scales.x.ticks.color = document.documentElement.classList.contains('dark') ? '#b3b4b8' : '#6b7280';
                 chart.options.scales.y.ticks.color = document.documentElement.classList.contains('dark') ? '#b3b4b8' : '#6b7280';
                 chart.options.scales.y.grid.color = document.documentElement.classList.contains('dark') ? 'rgba(179, 180, 184, 0.1)' : 'rgba(107, 114, 128, 0.1)';
-                
+
                 chart.update();
             }
         });
     });
-    
-    observer.observe(document.documentElement, { attributes: true });
+
+    observer.observe(document.documentElement, {
+        attributes: true
+    });
+
+    // Add keyboard shortcuts
+    document.addEventListener('keydown', function(e) {
+        // Ctrl/Cmd + K for search
+        if ((e.ctrlKey || e.metaKey) && e.key === 'k') {
+            e.preventDefault();
+            Alpine.store('searchOpen', true);
+        }
+
+        // Ctrl/Cmd + B for sidebar toggle
+        if ((e.ctrlKey || e.metaKey) && e.key === 'b') {
+            e.preventDefault();
+            Alpine.store('sidebarOpen', !Alpine.store('sidebarOpen'));
+        }
+    });
+
+    // Auto-refresh data every 30 seconds
+    setInterval(function() {
+        // Here you would typically fetch new data from your API
+        console.log('Refreshing dashboard data...');
+    }, 30000);
+
+
+    document.addEventListener('DOMContentLoaded', () => {
+        console.log('DOM loaded, initializing banner...');
+
+        const banner = document.getElementById('welcome-banner');
+        const closeBtn = document.getElementById('close-banner');
+
+        // Debug: Check if elements exist
+        console.log('Banner element:', banner);
+        console.log('Close button element:', closeBtn);
+
+        if (!banner) {
+            console.error('Banner element not found!');
+            return;
+        }
+
+        if (!closeBtn) {
+            console.error('Close button element not found!');
+            return;
+        }
+
+        // Hide banner if it was previously closed
+        if (localStorage.getItem('dashboardBannerClosed') === 'true') {
+            banner.classList.add('hidden');
+            console.log('Banner hidden due to previous close action');
+        } else {
+            console.log('Banner visible (default state)');
+        }
+
+        // Add click event listener with debugging
+        closeBtn.addEventListener('click', function(e) {
+            console.log('Close button clicked!');
+            e.preventDefault();
+            e.stopPropagation();
+
+            // Add smooth close animation
+            banner.style.transition = 'opacity 0.3s ease-out, transform 0.3s ease-out';
+            banner.style.opacity = '0';
+            banner.style.transform = 'translateY(-20px)';
+
+            // Hide banner after animation
+            setTimeout(() => {
+                banner.classList.add('hidden');
+                localStorage.setItem('dashboardBannerClosed', 'true');
+                console.log('Banner closed and saved to localStorage');
+
+                // Reset styles
+                banner.style.opacity = '';
+                banner.style.transform = '';
+            }, 300);
+        });
+
+        // Test function - call from console: testCloseButton()
+        window.testCloseButton = function() {
+            console.log('Testing close button...');
+            closeBtn.click();
+        };
+
+        // Reset function - call from console: resetBanner()
+        window.resetBanner = function() {
+            localStorage.removeItem('dashboardBannerClosed');
+            banner.classList.remove('hidden');
+            banner.style.opacity = '';
+            banner.style.transform = '';
+            console.log('Banner reset - should be visible now');
+        };
+
+        console.log('Banner initialization complete');
+    });
 </script>
+
+
 @endpush
