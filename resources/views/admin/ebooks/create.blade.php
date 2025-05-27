@@ -121,6 +121,9 @@
                 <label class="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">Description (optional)</label>
                 <textarea name="categories[INDEX].description" class="form-input form-input-sm" rows="2"></textarea>
             </div>
+            <!-- Hidden input to track parent relationship -->
+            <input type="hidden" name="categories[INDEX].parent_index" value="" class="parent-index-input">
+            <input type="hidden" name="categories[INDEX].level" value="0" class="level-input">
         </div>
         <div class="collapsible-children transition-all duration-300 ease-in-out overflow-hidden">
             <!-- Subcategories Container -->
@@ -281,20 +284,27 @@ function addSubcategory(button) {
     const categoryItem = button.closest('.category-item');
     const container = categoryItem.querySelector('.subcategories-container');
     const clone = template.content.cloneNode(true);
-    const categoryId = categoryItem.querySelector('input[name^="categories["]').name.match(/\[(\d+)\]/)[1];
-    const level = parseInt(categoryItem.dataset.level) + 1;
+    const parentCategoryId = categoryItem.querySelector('input[name^="categories["]').name.match(/\[(\d+)\]/)[1];
+    const level = parseInt(categoryItem.dataset.level || 0) + 1;
     const subcategoryId = categoryIndex++;
     const content = clone.querySelector('.category-item').innerHTML;
-    const updatedContent = content.replace(/INDEX/g, subcategoryId).replace(/CATEGORY_INDEX/g, categoryId);
+    const updatedContent = content.replace(/INDEX/g, subcategoryId).replace(/CATEGORY_INDEX/g, subcategoryId);
     const wrapper = document.createElement('div');
     wrapper.className = 'category-item border border-gray-200 dark:border-gray-700 rounded-lg p-4 mb-2 relative';
     wrapper.dataset.level = level;
     wrapper.innerHTML = updatedContent;
+    
+    // Set parent relationship
+    const parentIndexInput = wrapper.querySelector('.parent-index-input');
+    const levelInput = wrapper.querySelector('.level-input');
+    if (parentIndexInput) parentIndexInput.value = parentCategoryId;
+    if (levelInput) levelInput.value = level;
+    
     container.appendChild(wrapper);
     // Defer update to next event loop to ensure DOM is ready
     setTimeout(() => updateLeafResourceContainersRecursive(document.getElementById('categoriesContainer')), 0);
     // Hide resource container of parent category
-    const resourceContainer = categoryItem.querySelector('.resource-container');
+    const resourceContainer = categoryItem.querySelector(':scope > .collapsible-children > .resource-container');
     if (resourceContainer) {
         resourceContainer.style.display = 'none';
     }
@@ -353,8 +363,21 @@ function handleContentTypeChange(select) {
     }
 }
 
+// Add form submission handler to structure data properly
 document.addEventListener('DOMContentLoaded', function() {
     addRootCategory();
+    
+    // Handle form submission
+    document.getElementById('ebookForm').addEventListener('submit', function(e) {
+        console.log('Form submission started');
+        
+        // Log all form data before submission
+        const formData = new FormData(this);
+        console.log('Form data entries:');
+        for (let [key, value] of formData.entries()) {
+            console.log(key, ':', value);
+        }
+    });
 });
 </script>
 @endpush

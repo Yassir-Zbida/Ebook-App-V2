@@ -37,6 +37,9 @@ class EbookController extends Controller
      */
     public function store(Request $request)
     {
+        // Debug the incoming request
+        \Log::info('Ebook creation request:', $request->all());
+
         $validator = Validator::make($request->all(), [
             'title' => 'required|string|max:255',
             'description' => 'required|string',
@@ -46,85 +49,118 @@ class EbookController extends Controller
             'categories.*.name' => 'required|string|max:255',
             'categories.*.description' => 'nullable|string',
             'categories.*.icon' => 'nullable|string|max:50',
-            'categories.*.subcategories' => 'nullable|array',
-            'categories.*.subcategories.*.name' => 'required|string|max:255',
-            'categories.*.subcategories.*.description' => 'nullable|string',
-            'categories.*.subcategories.*.icon' => 'nullable|string|max:50',
-            'categories.*.subcategories.*.resources' => 'nullable|array',
-            'categories.*.subcategories.*.resources.*.title' => 'required|string|max:255',
-            'categories.*.subcategories.*.resources.*.content_type' => 'required|in:pdf,image,table',
-            'categories.*.subcategories.*.resources.*.file' => 'required_if:categories.*.subcategories.*.resources.*.content_type,pdf,image|file|mimes:pdf,jpg,jpeg,png|max:5120',
-            'categories.*.subcategories.*.resources.*.table_data' => 'required_if:categories.*.subcategories.*.resources.*.content_type,table|array',
+            'categories.*.parent_index' => 'nullable|string',
+            'categories.*.level' => 'nullable|integer|min:0',
+            'categories.*.resource.title' => 'nullable|string|max:255',
+            'categories.*.resource.content_type' => 'nullable|in:pdf,excel,xlsx',
+            'categories.*.resource.description' => 'nullable|string',
+            'categories.*.resource.file' => 'nullable|file|mimes:pdf,xlsx,xls|max:10240', // 10MB max
         ]);
 
         if ($validator->fails()) {
+            \Log::error('Validation failed:', $validator->errors()->toArray());
             return back()->withErrors($validator)->withInput();
         }
 
-        // Create ebook
-        $ebook = Ebook::create([
-            'title' => $request->title,
-            'description' => $request->description,
-            'price' => $request->price,
-            'is_active' => true,
-        ]);
-
-        // Handle cover image
-        if ($request->hasFile('cover_image')) {
-            $path = $request->file('cover_image')->store('ebooks/covers', 'public');
-            $ebook->update(['cover_image' => $path]);
-        }
-
-        // Create categories and their relationships
-        foreach ($request->categories as $categoryData) {
-            $category = $ebook->categories()->create([
-                'name' => $categoryData['name'],
-                'description' => $categoryData['description'] ?? null,
-                'icon' => $categoryData['icon'] ?? null,
-                'sort_order' => 0,
+        try {
+            // Create ebook
+            $ebook = Ebook::create([
+                'title' => $request->title,
+                'description' => $request->description,
+                'price' => $request->price,
                 'is_active' => true,
             ]);
 
-            // Create subcategories if any
-            if (isset($categoryData['subcategories'])) {
-                foreach ($categoryData['subcategories'] as $subcategoryData) {
-                    $subcategory = $category->children()->create([
-                        'ebook_id' => $ebook->id,
-                        'name' => $subcategoryData['name'],
-                        'description' => $subcategoryData['description'] ?? null,
-                        'icon' => $subcategoryData['icon'] ?? null,
-                        'sort_order' => 0,
-                        'is_active' => true,
-                    ]);
+            // Handle cover image
+            if ($request->hasFile('cover_image')) {
+                $path = $request->file('cover_image')->store('ebooks/covers', 'public');
+                $ebook->update(['cover_image' => $path]);
+            }
 
-                    // Create resources if any
-                    if (isset($subcategoryData['resources'])) {
-                        foreach ($subcategoryData['resources'] as $resourceData) {
-                            $resource = $subcategory->resources()->create([
-                                'title' => $resourceData['title'],
-                                'content_type' => $resourceData['content_type'],
-                                'description' => $resourceData['description'] ?? null,
-                                'sort_order' => 0,
-                                'is_active' => true,
-                            ]);
+            // Process categories from flat structure
+            $this->processFlatCategories($request->categories, $ebook->id, $request);
 
-                            // Handle resource content based on type
-                            if ($resourceData['content_type'] === 'table') {
-                                $resource->update([
-                                    'content_data' => $resourceData['table_data']
-                                ]);
-                            } elseif (isset($resourceData['file'])) {
-                                $path = $resourceData['file']->store('ebooks/resources', 'public');
-                                $resource->update(['file_path' => $path]);
-                            }
-                        }
-                    }
-                }
+            return redirect()->route('admin.ebooks.index')
+                ->with('success', 'Ebook created successfully.');
+
+        } catch (\Exception $e) {
+            \Log::error('Error creating ebook:', ['error' => $e->getMessage(), 'trace' => $e->getTraceAsString()]);
+            return back()->withErrors(['error' => 'An error occurred while creating the ebook: ' . $e->getMessage()])->withInput();
+        }
+    }
+
+    /**
+     * Process flat categories structure from the form
+     */
+    private function processFlatCategories($categories, $ebookId, $request)
+    {
+        $createdCategories = [];
+        
+        // First pass: create all categories without parent relationships
+        foreach ($categories as $index => $categoryData) {
+            $category = EbookCategory::create([
+                'ebook_id' => $ebookId,
+                'parent_id' => null, // Will be set in second pass
+                'name' => $categoryData['name'],
+                'description' => $categoryData['description'] ?? null,
+                'icon' => $categoryData['icon'] ?? null,
+                'sort_order' => $index,
+                'is_active' => true,
+            ]);
+
+            $createdCategories[$index] = [
+                'category' => $category,
+                'parent_index' => $categoryData['parent_index'] ?? null,
+                'level' => $categoryData['level'] ?? 0
+            ];
+
+            \Log::info('Created category:', [
+                'id' => $category->id, 
+                'name' => $category->name, 
+                'index' => $index,
+                'parent_index' => $categoryData['parent_index'] ?? null
+            ]);
+        }
+
+        // Second pass: set parent relationships
+        foreach ($createdCategories as $index => $categoryInfo) {
+            $parentIndex = $categoryInfo['parent_index'];
+            if ($parentIndex !== null && $parentIndex !== '' && isset($createdCategories[$parentIndex])) {
+                $parentCategory = $createdCategories[$parentIndex]['category'];
+                $categoryInfo['category']->update(['parent_id' => $parentCategory->id]);
+                
+                \Log::info('Set parent relationship:', [
+                    'child_id' => $categoryInfo['category']->id,
+                    'parent_id' => $parentCategory->id
+                ]);
             }
         }
 
-        return redirect()->route('admin.ebooks.index')
-            ->with('success', 'Ebook created successfully.');
+        // Third pass: handle resources
+        foreach ($categories as $index => $categoryData) {
+            if (isset($categoryData['resource']) && !empty($categoryData['resource']['title'])) {
+                $resourceData = $categoryData['resource'];
+                $category = $createdCategories[$index]['category'];
+                
+                $resource = CategoryResource::create([
+                    'category_id' => $category->id,
+                    'title' => $resourceData['title'],
+                    'content_type' => $resourceData['content_type'],
+                    'description' => $resourceData['description'] ?? null,
+                    'sort_order' => 0,
+                    'is_active' => true,
+                ]);
+
+                // Handle file upload
+                if ($request->hasFile("categories.{$index}.resource.file")) {
+                    $file = $request->file("categories.{$index}.resource.file");
+                    $path = $file->store('ebooks/resources', 'public');
+                    $resource->update(['file_path' => $path]);
+                    
+                    \Log::info('Uploaded resource file:', ['resource_id' => $resource->id, 'path' => $path]);
+                }
+            }
+        }
     }
 
     /**

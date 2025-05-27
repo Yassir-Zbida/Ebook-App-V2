@@ -28,6 +28,7 @@ class CategoryResource extends Model
     // Available content types
     const CONTENT_TYPES = [
         'pdf' => 'PDF Document',
+        'excel' => 'Excel File',
         'image' => 'Image',
         'docx' => 'Word Document',
         'pptx' => 'PowerPoint Presentation',
@@ -51,7 +52,7 @@ class CategoryResource extends Model
 
     public function isFileType()
     {
-        return in_array($this->content_type, ['pdf', 'image', 'docx', 'pptx', 'xlsx']);
+        return in_array($this->content_type, ['pdf', 'excel', 'image', 'docx', 'pptx', 'xlsx']);
     }
 
     public function isDataType()
