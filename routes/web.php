@@ -6,6 +6,7 @@ use App\Http\Controllers\EbookController;
 use App\Http\Controllers\EbookCategoryController;
 use App\Http\Controllers\CategoryResourceController;
 use Illuminate\Support\Facades\Route;
+use Illuminate\Http\Request;
 
 // Root redirect
 Route::get('/', function () {
@@ -40,3 +41,53 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->grou
     // Ebook management
     Route::resource('ebooks', \App\Http\Controllers\Admin\EbookController::class);
 });
+
+// Debug route to test form submission
+Route::post('/debug-form', function(Request $request) {
+    $result = [
+        'status' => 'debug_complete',
+        'all_input' => [],
+        'categories_analysis' => []
+    ];
+    
+    // Collect all input data
+    $allInput = $request->all();
+    foreach ($allInput as $key => $value) {
+        if (is_string($value)) {
+            $result['all_input'][$key] = substr($value, 0, 100);
+        } elseif (is_array($value)) {
+            $result['all_input'][$key] = 'ARRAY with ' . count($value) . ' items';
+            foreach ($value as $subKey => $subValue) {
+                if (is_string($subValue)) {
+                    $result['all_input'][$key . '[' . $subKey . ']'] = substr($subValue, 0, 50);
+                } elseif (is_array($subValue)) {
+                    $result['all_input'][$key . '[' . $subKey . ']'] = 'ARRAY with ' . count($subValue) . ' items';
+                } else {
+                    $result['all_input'][$key . '[' . $subKey . ']'] = gettype($subValue);
+                }
+            }
+        } else {
+            $result['all_input'][$key] = gettype($value);
+        }
+    }
+    
+    // Analyze categories specifically
+    $categories = $request->input('categories', []);
+    $result['categories_analysis'] = [
+        'type' => gettype($categories),
+        'count' => is_array($categories) ? count($categories) : 'N/A',
+        'is_array' => is_array($categories),
+        'first_item_type' => !empty($categories) ? gettype(reset($categories)) : 'empty'
+    ];
+    
+    if (is_array($categories) && !empty($categories)) {
+        $firstCategory = reset($categories);
+        if (is_array($firstCategory)) {
+            $result['categories_analysis']['first_item_keys'] = array_keys($firstCategory);
+        } elseif (is_string($firstCategory)) {
+            $result['categories_analysis']['first_item_value'] = substr($firstCategory, 0, 50);
+        }
+    }
+    
+    return response()->json($result, 200, [], JSON_PRETTY_PRINT);
+})->name('debug.form')->withoutMiddleware(['web']);

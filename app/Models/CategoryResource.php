@@ -16,6 +16,9 @@ class CategoryResource extends Model
         'description',
         'content_data',
         'file_path',
+        'original_filename',
+        'file_size',
+        'mime_type',
         'sort_order',
         'is_active',
     ];

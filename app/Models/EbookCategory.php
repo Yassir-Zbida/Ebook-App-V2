@@ -15,6 +15,7 @@ class EbookCategory extends Model
         'name',
         'description',
         'icon',
+        'image',
         'sort_order',
         'is_active',
     ];
