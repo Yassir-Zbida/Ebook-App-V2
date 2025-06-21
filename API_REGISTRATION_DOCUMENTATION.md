@@ -1,19 +1,34 @@
-# User Registration API Documentation
+# Ebook App API Documentation
 
 ## Overview
 
-The registration API endpoint allows new users to create accounts in the ebook ecommerce platform. This endpoint accepts JSON data and returns a Bearer token for authentication.
+This API provides endpoints for managing an ebook ecommerce platform. It includes user authentication, ebook browsing, shopping cart management, wishlist functionality, and order processing.
 
-## Endpoint Details
+## Base URL
 
-- **URL:** `POST /api/v1/register`
-- **Content-Type:** `application/json`
-- **Authentication:** Not required (public endpoint)
+```
+http://localhost:8000/api/v1
+```
 
-## Request Body (JSON)
+## Authentication
 
-### Required Fields
+Most endpoints require authentication using Bearer tokens. Include the token in the Authorization header:
 
+```
+Authorization: Bearer YOUR_TOKEN_HERE
+```
+
+---
+
+## Authentication Endpoints
+
+### User Registration
+
+**POST** `/register`
+
+Register a new user account.
+
+**Request Body:**
 ```json
 {
     "name": "John Doe",
@@ -23,28 +38,7 @@ The registration API endpoint allows new users to create accounts in the ebook e
 }
 ```
 
-### Field Descriptions
-
-| Field | Type | Required | Validation Rules | Description |
-|-------|------|----------|------------------|-------------|
-| `name` | string | Yes | max:255 | Full name of the user |
-| `email` | string | Yes | email, unique:users, max:255 | Valid email address (must be unique) |
-| `password` | string | Yes | min:8, mixed case, numbers, symbols | Secure password following Laravel's default rules |
-| `password_confirmation` | string | Yes | same:password | Password confirmation (must match password) |
-
-### Password Requirements
-
-The password must meet Laravel's default password rules:
-- Minimum 8 characters
-- At least one uppercase letter
-- At least one lowercase letter
-- At least one number
-- At least one symbol
-
-## Response Format
-
-### Success Response (201 Created)
-
+**Response:**
 ```json
 {
     "success": true,
@@ -62,137 +56,461 @@ The password must meet Laravel's default password rules:
 }
 ```
 
-### Error Response (422 Unprocessable Entity)
+### User Login
 
+**POST** `/login`
+
+Authenticate user and get access token.
+
+**Request Body:**
 ```json
 {
-    "success": false,
-    "message": "Validation failed",
-    "errors": {
-        "name": [
-            "The name field is required."
-        ],
-        "email": [
-            "The email field is required.",
-            "The email must be a valid email address.",
-            "The email has already been taken."
-        ],
-        "password": [
-            "The password field is required.",
-            "The password confirmation does not match.",
-            "The password must be at least 8 characters.",
-            "The password must contain at least one uppercase and one lowercase letter.",
-            "The password must contain at least one number.",
-            "The password must contain at least one symbol."
-        ]
+    "email": "john.doe@example.com",
+    "password": "SecurePassword123!"
+}
+```
+
+**Response:**
+```json
+{
+    "success": true,
+    "message": "Login successful",
+    "data": {
+        "user": {
+            "id": 1,
+            "name": "John Doe",
+            "email": "john.doe@example.com",
+            "role": "customer"
+        },
+        "token": "1|abc123def456ghi789jkl012mno345pqr678stu901vwx234yz567",
+        "token_type": "Bearer"
     }
 }
 ```
 
-## Example Usage
+### Forgot Password
 
-### cURL Example
+**POST** `/forgot-password`
 
-```bash
-curl -X POST http://localhost:8000/api/v1/register \
-  -H "Content-Type: application/json" \
-  -H "Accept: application/json" \
-  -d '{
-    "name": "John Doe",
+Send password reset link to user's email.
+
+**Request Body:**
+```json
+{
+    "email": "john.doe@example.com"
+}
+```
+
+### Reset Password
+
+**POST** `/reset-password`
+
+Reset user password using token.
+
+**Request Body:**
+```json
+{
+    "token": "reset_token_here",
     "email": "john.doe@example.com",
-    "password": "SecurePassword123!",
-    "password_confirmation": "SecurePassword123!"
-  }'
+    "password": "NewPassword123!",
+    "password_confirmation": "NewPassword123!"
+}
 ```
 
-### JavaScript/Fetch Example
+### Logout
 
-```javascript
-const response = await fetch('http://localhost:8000/api/v1/register', {
-    method: 'POST',
-    headers: {
-        'Content-Type': 'application/json',
-        'Accept': 'application/json'
-    },
-    body: JSON.stringify({
-        name: 'John Doe',
-        email: 'john.doe@example.com',
-        password: 'SecurePassword123!',
-        password_confirmation: 'SecurePassword123!'
-    })
-});
+**POST** `/logout` *(Requires Authentication)*
 
-const data = await response.json();
-console.log(data);
+Invalidate current access token.
+
+---
+
+## Ebook Endpoints
+
+### Get All Ebooks
+
+**GET** `/ebooks`
+
+Get paginated list of available ebooks.
+
+**Query Parameters:**
+- `search` - Search term for title/description
+- `min_price` - Minimum price filter
+- `max_price` - Maximum price filter
+- `sort_by` - Sort field (created_at, title, price)
+- `sort_order` - Sort direction (asc, desc)
+- `per_page` - Items per page (default: 12)
+
+**Response:**
+```json
+{
+    "success": true,
+    "data": {
+        "data": [
+            {
+                "id": 1,
+                "title": "Sample Ebook",
+                "description": "A great ebook",
+                "price": "29.99",
+                "cover_image": "http://localhost:8000/storage/ebooks/covers/sample.jpg",
+                "categories_count": 3,
+                "resources_count": 15,
+                "created_at": "2025-06-21T10:00:00.000000Z"
+            }
+        ],
+        "current_page": 1,
+        "per_page": 12,
+        "total": 50
+    }
+}
 ```
 
-### PHP Example
+### Get Single Ebook
 
-```php
-$response = Http::post('http://localhost:8000/api/v1/register', [
-    'name' => 'John Doe',
-    'email' => 'john.doe@example.com',
-    'password' => 'SecurePassword123!',
-    'password_confirmation' => 'SecurePassword123!'
-]);
+**GET** `/ebooks/{id}`
 
-$data = $response->json();
+Get detailed information about a specific ebook.
+
+**Response:**
+```json
+{
+    "success": true,
+    "data": {
+        "id": 1,
+        "title": "Sample Ebook",
+        "description": "A great ebook",
+        "price": "29.99",
+        "cover_image": "http://localhost:8000/storage/ebooks/covers/sample.jpg",
+        "categories_count": 3,
+        "resources_count": 15,
+        "created_at": "2025-06-21T10:00:00.000000Z"
+    }
+}
 ```
 
-## Using the Authentication Token
+### Search Ebooks
 
-After successful registration, you'll receive a Bearer token. Use this token in subsequent API requests:
+**GET** `/search/ebooks?q=search_term`
 
-```bash
-curl -H "Authorization: Bearer 1|abc123def456ghi789jkl012mno345pqr678stu901vwx234yz567" \
-     -H "Accept: application/json" \
-     http://localhost:8000/api/v1/user/profile
+Search ebooks by title or description.
+
+**Query Parameters:**
+- `q` - Search term (required)
+- `per_page` - Items per page
+
+### Get Featured Ebooks
+
+**GET** `/featured/ebooks`
+
+Get list of featured ebooks.
+
+### Get Popular Ebooks
+
+**GET** `/popular/ebooks`
+
+Get list of popular ebooks based on sales.
+
+---
+
+## Shopping Cart Endpoints *(Requires Authentication)*
+
+### Get Cart
+
+**GET** `/cart`
+
+Get user's shopping cart with all items.
+
+**Response:**
+```json
+{
+    "success": true,
+    "data": {
+        "cart_items": [
+            {
+                "id": 1,
+                "ebook": {
+                    "id": 1,
+                    "title": "Sample Ebook",
+                    "price": "29.99",
+                    "cover_image": "http://localhost:8000/storage/ebooks/covers/sample.jpg"
+                },
+                "quantity": 1,
+                "price": "29.99",
+                "discount_amount": "0.00",
+                "subtotal": "29.99"
+            }
+        ],
+        "subtotal": "29.99",
+        "discount_amount": "0.00",
+        "tax_amount": "0.00",
+        "total": "29.99",
+        "items_count": 1,
+        "coupon_code": null,
+        "coupon_discount": "0.00"
+    }
+}
 ```
 
-## User Role Assignment
+### Add Item to Cart
 
-- All newly registered users are automatically assigned the `customer` role
-- Users are set as `is_active = true` by default
-- Only administrators can change user roles through the admin panel
+**POST** `/cart/add`
 
-## Security Considerations
+Add an ebook to the shopping cart.
 
-1. **Password Security**: Passwords are hashed using Laravel's bcrypt algorithm
-2. **Email Uniqueness**: Each email address can only be used once
-3. **Token Security**: Tokens are generated using Laravel Sanctum
-4. **Input Validation**: All inputs are validated and sanitized
-5. **Rate Limiting**: Consider implementing rate limiting for production use
-
-## Error Handling
-
-The API returns appropriate HTTP status codes:
-
-- `201 Created`: Registration successful
-- `422 Unprocessable Entity`: Validation errors
-- `500 Internal Server Error`: Server errors
-
-## Database Schema
-
-The user record is created in the `users` table with the following structure:
-
-```sql
-CREATE TABLE users (
-    id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
-    name VARCHAR(255) NOT NULL,
-    email VARCHAR(255) UNIQUE NOT NULL,
-    email_verified_at TIMESTAMP NULL,
-    password VARCHAR(255) NOT NULL,
-    role ENUM('admin', 'customer') DEFAULT 'customer',
-    is_active BOOLEAN DEFAULT TRUE,
-    remember_token VARCHAR(100) NULL,
-    created_at TIMESTAMP NULL,
-    updated_at TIMESTAMP NULL
-);
+**Request Body:**
+```json
+{
+    "ebook_id": 1,
+    "quantity": 1
+}
 ```
 
-## Related Endpoints
+### Update Cart Item
 
-- `POST /api/v1/login` - User login
-- `POST /api/v1/forgot-password` - Password reset request
-- `POST /api/v1/reset-password` - Password reset
-- `POST /api/v1/logout` - User logout (requires authentication) 
+**PUT** `/cart/items/{itemId}`
+
+Update quantity of a cart item.
+
+**Request Body:**
+```json
+{
+    "quantity": 2
+}
+```
+
+### Remove Item from Cart
+
+**DELETE** `/cart/items/{itemId}`
+
+Remove an item from the cart.
+
+### Clear Cart
+
+**DELETE** `/cart/clear`
+
+Remove all items from the cart.
+
+### Apply Coupon
+
+**POST** `/cart/apply-coupon`
+
+Apply a coupon code to the cart.
+
+**Request Body:**
+```json
+{
+    "coupon_code": "SAVE20"
+}
+```
+
+### Remove Coupon
+
+**DELETE** `/cart/remove-coupon`
+
+Remove applied coupon from the cart.
+
+---
+
+## Wishlist Endpoints *(Requires Authentication)*
+
+### Get Wishlist
+
+**GET** `/wishlist`
+
+Get user's wishlist with all saved ebooks.
+
+**Query Parameters:**
+- `sort_by` - Sort field (created_at, title)
+- `sort_order` - Sort direction (asc, desc)
+- `per_page` - Items per page
+
+### Add to Wishlist
+
+**POST** `/wishlist/{ebookId}`
+
+Add an ebook to the wishlist.
+
+### Remove from Wishlist
+
+**DELETE** `/wishlist/{ebookId}`
+
+Remove an ebook from the wishlist.
+
+### Check Wishlist Status
+
+**GET** `/wishlist/{ebookId}/check`
+
+Check if an ebook is in the user's wishlist.
+
+**Response:**
+```json
+{
+    "success": true,
+    "data": {
+        "ebook_id": 1,
+        "is_in_wishlist": true
+    }
+}
+```
+
+### Move to Cart
+
+**POST** `/wishlist/{ebookId}/move-to-cart`
+
+Move an ebook from wishlist to cart.
+
+### Clear Wishlist
+
+**DELETE** `/wishlist/clear`
+
+Remove all items from the wishlist.
+
+### Get Wishlist Count
+
+**GET** `/wishlist/count`
+
+Get the number of items in the wishlist.
+
+**Response:**
+```json
+{
+    "success": true,
+    "data": {
+        "count": 5
+    }
+}
+```
+
+---
+
+## User Profile Endpoints *(Requires Authentication)*
+
+### Get Profile
+
+**GET** `/user/profile`
+
+Get current user's profile information.
+
+### Update Profile
+
+**PUT** `/user/profile`
+
+Update user's profile information.
+
+**Request Body:**
+```json
+{
+    "name": "John Doe Updated",
+    "email": "john.updated@example.com"
+}
+```
+
+### Change Password
+
+**PUT** `/user/password`
+
+Change user's password.
+
+**Request Body:**
+```json
+{
+    "current_password": "OldPassword123!",
+    "password": "NewPassword123!",
+    "password_confirmation": "NewPassword123!"
+}
+```
+
+---
+
+## Order Endpoints *(Requires Authentication)*
+
+### Get User Orders
+
+**GET** `/user/orders`
+
+Get user's order history.
+
+### Get Order Details
+
+**GET** `/user/orders/{orderId}`
+
+Get detailed information about a specific order.
+
+### Checkout
+
+**POST** `/checkout`
+
+Process checkout from cart.
+
+**Request Body:**
+```json
+{
+    "payment_method": "stripe"
+}
+```
+
+---
+
+## Category Endpoints
+
+### Get All Categories
+
+**GET** `/categories`
+
+Get list of all categories.
+
+### Get Category Details
+
+**GET** `/categories/{id}`
+
+Get detailed information about a category.
+
+### Get Category Resources
+
+**GET** `/categories/{id}/resources`
+
+Get resources for a specific category.
+
+---
+
+## Error Responses
+
+All endpoints return consistent error responses:
+
+```json
+{
+    "success": false,
+    "message": "Error description",
+    "errors": {
+        "field": ["Validation error message"]
+    }
+}
+```
+
+Common HTTP Status Codes:
+- `200` - Success
+- `201` - Created
+- `400` - Bad Request
+- `401` - Unauthorized
+- `403` - Forbidden
+- `404` - Not Found
+- `422` - Validation Error
+- `500` - Server Error
+
+---
+
+## Rate Limiting
+
+API requests are rate limited to prevent abuse. Limits may vary by endpoint.
+
+---
+
+## Versioning
+
+This API is versioned. The current version is `v1`. Include the version in the URL path.
+
+---
+
+## Support
+
+For API support, please contact the development team or refer to the internal documentation. 

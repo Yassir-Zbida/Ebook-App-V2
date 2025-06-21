@@ -8,6 +8,8 @@ use App\Http\Controllers\Api\CategoryController;
 use App\Http\Controllers\Api\ResourceController;
 use App\Http\Controllers\Api\OrderController;
 use App\Http\Controllers\Api\UserController;
+use App\Http\Controllers\Api\CartController;
+use App\Http\Controllers\Api\WishlistController;
 
 /*
 |--------------------------------------------------------------------------
@@ -65,17 +67,23 @@ Route::prefix('v1')->middleware('auth:sanctum')->group(function () {
     Route::get('/user/orders', [OrderController::class, 'userOrders']);
     Route::get('/user/orders/{order}', [OrderController::class, 'userOrderDetail']);
     
-    // Wishlist functionality
-    Route::get('/user/wishlist', [UserController::class, 'wishlist']);
-    Route::post('/user/wishlist/{ebook}', [UserController::class, 'addToWishlist']);
-    Route::delete('/user/wishlist/{ebook}', [UserController::class, 'removeFromWishlist']);
+    // Shopping cart management
+    Route::get('/cart', [CartController::class, 'index']);
+    Route::post('/cart/add', [CartController::class, 'addItem']);
+    Route::put('/cart/items/{itemId}', [CartController::class, 'updateItem']);
+    Route::delete('/cart/items/{itemId}', [CartController::class, 'removeItem']);
+    Route::delete('/cart/clear', [CartController::class, 'clear']);
+    Route::post('/cart/apply-coupon', [CartController::class, 'applyCoupon']);
+    Route::delete('/cart/remove-coupon', [CartController::class, 'removeCoupon']);
     
-    // Shopping cart (if implemented)
-    Route::get('/user/cart', [OrderController::class, 'cart']);
-    Route::post('/user/cart/add', [OrderController::class, 'addToCart']);
-    Route::put('/user/cart/update', [OrderController::class, 'updateCart']);
-    Route::delete('/user/cart/remove/{ebook}', [OrderController::class, 'removeFromCart']);
-    Route::delete('/user/cart/clear', [OrderController::class, 'clearCart']);
+    // Wishlist management
+    Route::get('/wishlist', [WishlistController::class, 'index']);
+    Route::post('/wishlist/{ebook}', [WishlistController::class, 'add']);
+    Route::delete('/wishlist/{ebook}', [WishlistController::class, 'remove']);
+    Route::get('/wishlist/{ebook}/check', [WishlistController::class, 'check']);
+    Route::post('/wishlist/{ebook}/move-to-cart', [WishlistController::class, 'moveToCart']);
+    Route::delete('/wishlist/clear', [WishlistController::class, 'clear']);
+    Route::get('/wishlist/count', [WishlistController::class, 'count']);
     
     // Checkout and purchase
     Route::post('/checkout', [OrderController::class, 'checkout']);
