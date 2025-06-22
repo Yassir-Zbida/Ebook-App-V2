@@ -5,7 +5,10 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Models\User;
 use App\Models\Ebook;
-use App\Models\UserEbook;
+use App\Models\Order;
+use App\Models\OrderItem;
+use App\Models\Cart;
+use App\Models\CartItem;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
@@ -19,31 +22,28 @@ class OrderController extends Controller
     {
         $user = $request->user();
 
-        $query = $user->purchasedEbooks()->with(['categories' => function($query) {
-            $query->whereNull('parent_id')->orderBy('sort_order');
-        }]);
+        $orders = Order::where('user_id', $user->id)
+            ->with(['items.ebook'])
+            ->orderBy('created_at', 'desc')
+            ->paginate(12);
 
-        // Apply sorting
-        $sortBy = $request->get('sort_by', 'purchased_at');
-        $sortOrder = $request->get('sort_order', 'desc');
-        $query->orderBy('user_ebooks.' . $sortBy, $sortOrder);
-
-        // Pagination
-        $perPage = $request->get('per_page', 12);
-        $orders = $query->paginate($perPage);
-
-        $orders->getCollection()->transform(function ($ebook) {
+        $orders->getCollection()->transform(function ($order) {
             return [
-                'order_id' => $ebook->pivot->id,
-                'ebook_id' => $ebook->id,
-                'title' => $ebook->title,
-                'description' => $ebook->description,
-                'price' => $ebook->price,
-                'cover_image' => $ebook->cover_image,
-                'purchase_price' => $ebook->pivot->purchase_price,
-                'purchased_at' => $ebook->pivot->purchased_at,
-                'categories_count' => $ebook->categories->count(),
-                'resources_count' => $ebook->getAllResourcesCount(),
+                'order_id' => $order->id,
+                'order_number' => $order->order_number,
+                'status' => $order->status,
+                'total_amount' => $order->total_amount,
+                'items_count' => $order->items->count(),
+                'created_at' => $order->created_at,
+                'items' => $order->items->map(function ($item) {
+                    return [
+                        'id' => $item->id,
+                        'ebook_id' => $item->ebook_id,
+                        'ebook_title' => $item->ebook_title,
+                        'price' => $item->price,
+                        'subtotal' => $item->subtotal,
+                    ];
+                }),
             ];
         });
 
@@ -60,11 +60,9 @@ class OrderController extends Controller
     {
         $user = $request->user();
 
-        $order = UserEbook::where('id', $orderId)
+        $order = Order::where('id', $orderId)
             ->where('user_id', $user->id)
-            ->with(['ebook.categories' => function($query) {
-                $query->whereNull('parent_id')->orderBy('sort_order');
-            }])
+            ->with(['items.ebook'])
             ->first();
 
         if (!$order) {
@@ -78,18 +76,31 @@ class OrderController extends Controller
             'success' => true,
             'data' => [
                 'order_id' => $order->id,
-                'ebook' => [
-                    'id' => $order->ebook->id,
-                    'title' => $order->ebook->title,
-                    'description' => $order->ebook->description,
-                    'price' => $order->ebook->price,
-                    'cover_image' => $order->ebook->cover_image,
-                    'categories_count' => $order->ebook->categories->count(),
-                    'resources_count' => $order->ebook->getAllResourcesCount(),
-                ],
-                'purchase_price' => $order->purchase_price,
-                'purchased_at' => $order->purchased_at,
+                'order_number' => $order->order_number,
+                'status' => $order->status,
+                'subtotal' => $order->subtotal,
+                'discount_amount' => $order->discount_amount,
+                'tax_amount' => $order->tax_amount,
+                'total_amount' => $order->total_amount,
+                'payment_method' => $order->payment_method,
+                'payment_status' => $order->payment_status,
                 'created_at' => $order->created_at,
+                'completed_at' => $order->completed_at,
+                'items' => $order->items->map(function ($item) {
+                    return [
+                        'id' => $item->id,
+                        'ebook_id' => $item->ebook_id,
+                        'ebook_title' => $item->ebook_title,
+                        'price' => $item->price,
+                        'subtotal' => $item->subtotal,
+                        'ebook' => [
+                            'id' => $item->ebook->id,
+                            'title' => $item->ebook->title,
+                            'description' => $item->ebook->description,
+                            'cover_image' => $item->ebook->cover_image,
+                        ],
+                    ];
+                }),
             ]
         ]);
     }
@@ -159,14 +170,13 @@ class OrderController extends Controller
     }
 
     /**
-     * Process checkout
+     * Process checkout from cart
      */
     public function checkout(Request $request)
     {
         $validator = Validator::make($request->all(), [
-            'ebook_ids' => 'required|array',
-            'ebook_ids.*' => 'exists:ebooks,id',
             'payment_method' => 'required|string|in:stripe,paypal,cash',
+            'billing_info' => 'nullable|array',
         ]);
 
         if ($validator->fails()) {
@@ -178,9 +188,19 @@ class OrderController extends Controller
         }
 
         $user = $request->user();
-        $ebookIds = $request->ebook_ids;
+        
+        // Get user's cart
+        $cart = Cart::where('session_id', $user->id)->first();
+        
+        if (!$cart || $cart->items->isEmpty()) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Cart is empty'
+            ], 400);
+        }
 
         // Check if user already purchased any of these ebooks
+        $ebookIds = $cart->items->pluck('ebook_id')->toArray();
         $alreadyPurchased = $user->purchasedEbooks()
             ->whereIn('ebook_id', $ebookIds)
             ->pluck('ebook_id')
@@ -194,55 +214,65 @@ class OrderController extends Controller
             ], 400);
         }
 
-        // Get ebooks and calculate total
-        $ebooks = Ebook::whereIn('id', $ebookIds)
-            ->where('is_active', true)
-            ->get();
-
-        if ($ebooks->count() !== count($ebookIds)) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Some ebooks are not available'
-            ], 400);
-        }
-
-        $total = $ebooks->sum('price');
-
         try {
             DB::beginTransaction();
 
-            // Create purchase records
-            $purchases = [];
-            foreach ($ebooks as $ebook) {
-                $purchases[] = [
+            // Create order
+            $order = Order::create([
+                'order_number' => 'ORD-' . time() . '-' . $user->id,
+                'user_id' => $user->id,
+                'status' => 'pending',
+                'subtotal' => $cart->subtotal,
+                'discount_amount' => $cart->discount_amount,
+                'tax_amount' => $cart->tax_amount,
+                'total_amount' => $cart->total,
+                'coupon_code' => $cart->coupon_code,
+                'coupon_discount' => $cart->coupon_discount,
+                'payment_method' => $request->payment_method,
+                'payment_status' => 'pending',
+                'billing_info' => $request->billing_info,
+            ]);
+
+            // Create order items
+            foreach ($cart->items as $cartItem) {
+                OrderItem::create([
+                    'order_id' => $order->id,
+                    'ebook_id' => $cartItem->ebook_id,
+                    'ebook_title' => $cartItem->ebook->title,
+                    'price' => $cartItem->price,
+                    'discount_amount' => $cartItem->discount_amount,
+                    'subtotal' => $cartItem->subtotal,
+                ]);
+            }
+
+            // Create purchase records in user_ebooks table
+            foreach ($cart->items as $cartItem) {
+                DB::table('user_ebooks')->insert([
                     'user_id' => $user->id,
-                    'ebook_id' => $ebook->id,
-                    'purchase_price' => $ebook->price,
+                    'ebook_id' => $cartItem->ebook_id,
+                    'purchase_price' => $cartItem->price,
                     'purchased_at' => now(),
                     'created_at' => now(),
                     'updated_at' => now(),
-                ];
+                ]);
             }
 
-            UserEbook::insert($purchases);
+            // Clear the cart
+            $cart->items()->delete();
+            $cart->delete();
 
             DB::commit();
 
             return response()->json([
                 'success' => true,
-                'message' => 'Purchase completed successfully',
+                'message' => 'Order placed successfully',
                 'data' => [
-                    'total_amount' => $total,
-                    'items_count' => count($ebooks),
-                    'purchased_ebooks' => $ebooks->map(function ($ebook) {
-                        return [
-                            'id' => $ebook->id,
-                            'title' => $ebook->title,
-                            'price' => $ebook->price,
-                        ];
-                    }),
-                    'order_id' => uniqid('ORD-'),
-                    'purchased_at' => now(),
+                    'order_id' => $order->id,
+                    'order_number' => $order->order_number,
+                    'total_amount' => $order->total_amount,
+                    'items_count' => $order->items->count(),
+                    'status' => $order->status,
+                    'created_at' => $order->created_at,
                 ]
             ], 201);
 
@@ -251,7 +281,7 @@ class OrderController extends Controller
             
             return response()->json([
                 'success' => false,
-                'message' => 'Failed to process purchase',
+                'message' => 'Failed to process order',
                 'error' => $e->getMessage()
             ], 500);
         }

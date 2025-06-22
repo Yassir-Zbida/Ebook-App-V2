@@ -49,7 +49,6 @@ class CartController extends Controller
                     return [
                         'id' => $item->id,
                         'ebook' => new EbookResource($item->ebook),
-                        'quantity' => $item->quantity,
                         'price' => $item->price,
                         'discount_amount' => $item->discount_amount,
                         'subtotal' => $item->subtotal,
@@ -73,7 +72,6 @@ class CartController extends Controller
     {
         $validator = Validator::make($request->all(), [
             'ebook_id' => 'required|exists:ebooks,id',
-            'quantity' => 'integer|min:1|max:10',
         ]);
 
         if ($validator->fails()) {
@@ -86,7 +84,6 @@ class CartController extends Controller
 
         $user = $request->user();
         $ebookId = $request->ebook_id;
-        $quantity = $request->get('quantity', 1);
 
         // Check if ebook exists and is active
         $ebook = Ebook::where('id', $ebookId)->where('is_active', true)->first();
@@ -121,20 +118,18 @@ class CartController extends Controller
             $existingItem = $cart->items()->where('ebook_id', $ebookId)->first();
             
             if ($existingItem) {
-                // Update quantity
-                $existingItem->update([
-                    'quantity' => $existingItem->quantity + $quantity
-                ]);
-                $existingItem->calculateSubtotal();
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Item already exists in cart'
+                ], 400);
             } else {
                 // Create new cart item
                 CartItem::create([
                     'cart_id' => $cart->id,
                     'ebook_id' => $ebookId,
-                    'quantity' => $quantity,
                     'price' => $ebook->price,
                     'discount_amount' => 0,
-                    'subtotal' => $ebook->price * $quantity,
+                    'subtotal' => $ebook->price,
                 ]);
             }
 
@@ -153,60 +148,6 @@ class CartController extends Controller
             return response()->json([
                 'success' => false,
                 'message' => 'Failed to add item to cart'
-            ], 500);
-        }
-    }
-
-    /**
-     * Update cart item
-     */
-    public function updateItem(Request $request, $itemId)
-    {
-        $validator = Validator::make($request->all(), [
-            'quantity' => 'required|integer|min:1|max:10',
-        ]);
-
-        if ($validator->fails()) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Validation failed',
-                'errors' => $validator->errors()
-            ], 422);
-        }
-
-        $user = $request->user();
-        $cart = Cart::where('session_id', $user->id)->first();
-
-        if (!$cart) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Cart not found'
-            ], 404);
-        }
-
-        $cartItem = $cart->items()->where('id', $itemId)->first();
-
-        if (!$cartItem) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Cart item not found'
-            ], 404);
-        }
-
-        try {
-            $cartItem->update(['quantity' => $request->quantity]);
-            $cartItem->calculateSubtotal();
-            $cart->calculateTotals();
-
-            return response()->json([
-                'success' => true,
-                'message' => 'Cart item updated successfully'
-            ]);
-
-        } catch (\Exception $e) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Failed to update cart item'
             ], 500);
         }
     }

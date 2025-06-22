@@ -214,23 +214,6 @@
 					}
 				},
 				{
-					"name": "Get Ebook Categories",
-					"request": {
-						"method": "GET",
-						"header": [
-							{
-								"key": "Accept",
-								"value": "application/json"
-							}
-						],
-						"url": {
-							"raw": "{{base_url}}/v1/ebooks/1/categories",
-							"host": ["{{base_url}}"],
-							"path": ["v1", "ebooks", "1", "categories"]
-						}
-					}
-				},
-				{
 					"name": "Search Ebooks",
 					"request": {
 						"method": "GET",
@@ -241,20 +224,20 @@
 							}
 						],
 						"url": {
-							"raw": "{{base_url}}/v1/search/ebooks?q=ecommerce",
+							"raw": "{{base_url}}/v1/search/ebooks?q=programming",
 							"host": ["{{base_url}}"],
 							"path": ["v1", "search", "ebooks"],
 							"query": [
 								{
 									"key": "q",
-									"value": "ecommerce"
+									"value": "programming"
 								}
 							]
 						}
 					}
 				},
 				{
-					"name": "Featured Ebooks",
+					"name": "Get Featured Ebooks",
 					"request": {
 						"method": "GET",
 						"header": [
@@ -271,7 +254,7 @@
 					}
 				},
 				{
-					"name": "Popular Ebooks",
+					"name": "Get Popular Ebooks",
 					"request": {
 						"method": "GET",
 						"header": [
@@ -286,83 +269,349 @@
 							"path": ["v1", "popular", "ebooks"]
 						}
 					}
+				},
+				{
+					"name": "Get Ebook Reviews (Public)",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/v1/ebooks/1/reviews",
+							"host": ["{{base_url}}"],
+							"path": ["v1", "ebooks", "1", "reviews"]
+						}
+					}
 				}
 			]
 		},
 		{
-			"name": "Public Categories",
+			"name": "Shopping Cart (Authenticated)",
 			"item": [
 				{
-					"name": "List All Categories",
+					"name": "Get Cart",
 					"request": {
 						"method": "GET",
 						"header": [
 							{
 								"key": "Accept",
 								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{auth_token}}"
 							}
 						],
 						"url": {
-							"raw": "{{base_url}}/v1/categories",
+							"raw": "{{base_url}}/v1/cart",
 							"host": ["{{base_url}}"],
-							"path": ["v1", "categories"]
+							"path": ["v1", "cart"]
 						}
 					}
 				},
 				{
-					"name": "Get Single Category",
+					"name": "Add to Cart",
 					"request": {
-						"method": "GET",
+						"method": "POST",
 						"header": [
 							{
 								"key": "Accept",
 								"value": "application/json"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{auth_token}}"
 							}
 						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"ebook_id\": 1\n}"
+						},
 						"url": {
-							"raw": "{{base_url}}/v1/categories/1",
+							"raw": "{{base_url}}/v1/cart/add",
 							"host": ["{{base_url}}"],
-							"path": ["v1", "categories", "1"]
+							"path": ["v1", "cart", "add"]
 						}
 					}
 				},
 				{
-					"name": "Get Category Resources",
+					"name": "Remove from Cart",
 					"request": {
-						"method": "GET",
+						"method": "DELETE",
 						"header": [
 							{
 								"key": "Accept",
 								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{auth_token}}"
 							}
 						],
 						"url": {
-							"raw": "{{base_url}}/v1/categories/1/resources",
+							"raw": "{{base_url}}/v1/cart/items/1",
 							"host": ["{{base_url}}"],
-							"path": ["v1", "categories", "1", "resources"]
+							"path": ["v1", "cart", "items", "1"]
 						}
 					}
 				},
 				{
-					"name": "Search Categories",
+					"name": "Clear Cart",
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{auth_token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/v1/cart/clear",
+							"host": ["{{base_url}}"],
+							"path": ["v1", "cart", "clear"]
+						}
+					}
+				},
+				{
+					"name": "Apply Coupon",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{auth_token}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"coupon_code\": \"SAVE20\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/v1/cart/apply-coupon",
+							"host": ["{{base_url}}"],
+							"path": ["v1", "cart", "apply-coupon"]
+						}
+					}
+				},
+				{
+					"name": "Remove Coupon",
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{auth_token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/v1/cart/remove-coupon",
+							"host": ["{{base_url}}"],
+							"path": ["v1", "cart", "remove-coupon"]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "Orders (Authenticated)",
+			"item": [
+				{
+					"name": "Checkout from Cart",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{auth_token}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"payment_method\": \"stripe\",\n    \"billing_info\": {\n        \"name\": \"John Doe\",\n        \"email\": \"john@example.com\",\n        \"address\": \"123 Main St\",\n        \"city\": \"New York\",\n        \"state\": \"NY\",\n        \"zip\": \"10001\",\n        \"country\": \"US\"\n    }\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/v1/checkout",
+							"host": ["{{base_url}}"],
+							"path": ["v1", "checkout"]
+						}
+					}
+				},
+				{
+					"name": "Get User Orders",
 					"request": {
 						"method": "GET",
 						"header": [
 							{
 								"key": "Accept",
 								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{auth_token}}"
 							}
 						],
 						"url": {
-							"raw": "{{base_url}}/v1/search/categories?q=marketing",
+							"raw": "{{base_url}}/v1/user/orders",
 							"host": ["{{base_url}}"],
-							"path": ["v1", "search", "categories"],
-							"query": [
-								{
-									"key": "q",
-									"value": "marketing"
-								}
-							]
+							"path": ["v1", "user", "orders"]
+						}
+					}
+				},
+				{
+					"name": "Get Order Details",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{auth_token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/v1/user/orders/1",
+							"host": ["{{base_url}}"],
+							"path": ["v1", "user", "orders", "1"]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "Reviews (Authenticated)",
+			"item": [
+				{
+					"name": "Submit Review",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{auth_token}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"rating\": 5,\n    \"review\": \"Excellent ebook with great content!\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/v1/ebooks/1/reviews",
+							"host": ["{{base_url}}"],
+							"path": ["v1", "ebooks", "1", "reviews"]
+						}
+					}
+				},
+				{
+					"name": "Update Review",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{auth_token}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"rating\": 4,\n    \"review\": \"Updated review text\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/v1/reviews/1",
+							"host": ["{{base_url}}"],
+							"path": ["v1", "reviews", "1"]
+						}
+					}
+				},
+				{
+					"name": "Delete Review",
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{auth_token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/v1/reviews/1",
+							"host": ["{{base_url}}"],
+							"path": ["v1", "reviews", "1"]
+						}
+					}
+				},
+				{
+					"name": "Get User Reviews",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{auth_token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/v1/user/reviews",
+							"host": ["{{base_url}}"],
+							"path": ["v1", "user", "reviews"]
 						}
 					}
 				}
@@ -372,7 +621,7 @@
 			"name": "User Profile (Authenticated)",
 			"item": [
 				{
-					"name": "Get User Profile",
+					"name": "Get Profile",
 					"request": {
 						"method": "GET",
 						"header": [
@@ -393,7 +642,7 @@
 					}
 				},
 				{
-					"name": "Update User Profile",
+					"name": "Update Profile",
 					"request": {
 						"method": "PUT",
 						"header": [
@@ -441,7 +690,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"current_password\": \"oldpassword\",\n    \"password\": \"newpassword123\",\n    \"password_confirmation\": \"newpassword123\"\n}"
+							"raw": "{\n    \"current_password\": \"oldpassword123\",\n    \"password\": \"newpassword123\",\n    \"password_confirmation\": \"newpassword123\"\n}"
 						},
 						"url": {
 							"raw": "{{base_url}}/v1/user/password",
@@ -453,10 +702,10 @@
 			]
 		},
 		{
-			"name": "Purchased Ebooks (Authenticated)",
+			"name": "Wishlist (Authenticated)",
 			"item": [
 				{
-					"name": "Get User's Purchased Ebooks",
+					"name": "Get Wishlist",
 					"request": {
 						"method": "GET",
 						"header": [
@@ -470,103 +719,14 @@
 							}
 						],
 						"url": {
-							"raw": "{{base_url}}/v1/user/ebooks",
+							"raw": "{{base_url}}/v1/wishlist",
 							"host": ["{{base_url}}"],
-							"path": ["v1", "user", "ebooks"]
+							"path": ["v1", "wishlist"]
 						}
 					}
 				},
 				{
-					"name": "Get Purchased Ebook Detail",
-					"request": {
-						"method": "GET",
-						"header": [
-							{
-								"key": "Accept",
-								"value": "application/json"
-							},
-							{
-								"key": "Authorization",
-								"value": "Bearer {{auth_token}}"
-							}
-						],
-						"url": {
-							"raw": "{{base_url}}/v1/user/ebooks/1",
-							"host": ["{{base_url}}"],
-							"path": ["v1", "user", "ebooks", "1"]
-						}
-					}
-				},
-				{
-					"name": "Get Purchased Ebook Categories",
-					"request": {
-						"method": "GET",
-						"header": [
-							{
-								"key": "Accept",
-								"value": "application/json"
-							},
-							{
-								"key": "Authorization",
-								"value": "Bearer {{auth_token}}"
-							}
-						],
-						"url": {
-							"raw": "{{base_url}}/v1/user/ebooks/1/categories",
-							"host": ["{{base_url}}"],
-							"path": ["v1", "user", "ebooks", "1", "categories"]
-						}
-					}
-				},
-				{
-					"name": "Get Purchased Ebook Resources",
-					"request": {
-						"method": "GET",
-						"header": [
-							{
-								"key": "Accept",
-								"value": "application/json"
-							},
-							{
-								"key": "Authorization",
-								"value": "Bearer {{auth_token}}"
-							}
-						],
-						"url": {
-							"raw": "{{base_url}}/v1/user/ebooks/1/categories/1/resources",
-							"host": ["{{base_url}}"],
-							"path": ["v1", "user", "ebooks", "1", "categories", "1", "resources"]
-						}
-					}
-				}
-			]
-		},
-		{
-			"name": "Shopping Cart (Authenticated)",
-			"item": [
-				{
-					"name": "Get Cart",
-					"request": {
-						"method": "GET",
-						"header": [
-							{
-								"key": "Accept",
-								"value": "application/json"
-							},
-							{
-								"key": "Authorization",
-								"value": "Bearer {{auth_token}}"
-							}
-						],
-						"url": {
-							"raw": "{{base_url}}/v1/user/cart",
-							"host": ["{{base_url}}"],
-							"path": ["v1", "user", "cart"]
-						}
-					}
-				},
-				{
-					"name": "Add to Cart",
+					"name": "Add to Wishlist",
 					"request": {
 						"method": "POST",
 						"header": [
@@ -575,56 +735,19 @@
 								"value": "application/json"
 							},
 							{
-								"key": "Content-Type",
-								"value": "application/json"
-							},
-							{
 								"key": "Authorization",
 								"value": "Bearer {{auth_token}}"
 							}
 						],
-						"body": {
-							"mode": "raw",
-							"raw": "{\n    \"ebook_id\": 1,\n    \"quantity\": 1\n}"
-						},
 						"url": {
-							"raw": "{{base_url}}/v1/user/cart/add",
+							"raw": "{{base_url}}/v1/wishlist/1",
 							"host": ["{{base_url}}"],
-							"path": ["v1", "user", "cart", "add"]
+							"path": ["v1", "wishlist", "1"]
 						}
 					}
 				},
 				{
-					"name": "Update Cart",
-					"request": {
-						"method": "PUT",
-						"header": [
-							{
-								"key": "Accept",
-								"value": "application/json"
-							},
-							{
-								"key": "Content-Type",
-								"value": "application/json"
-							},
-							{
-								"key": "Authorization",
-								"value": "Bearer {{auth_token}}"
-							}
-						],
-						"body": {
-							"mode": "raw",
-							"raw": "{\n    \"items\": [\n        {\n            \"ebook_id\": 1,\n            \"quantity\": 2\n        }\n    ]\n}"
-						},
-						"url": {
-							"raw": "{{base_url}}/v1/user/cart/update",
-							"host": ["{{base_url}}"],
-							"path": ["v1", "user", "cart", "update"]
-						}
-					}
-				},
-				{
-					"name": "Remove from Cart",
+					"name": "Remove from Wishlist",
 					"request": {
 						"method": "DELETE",
 						"header": [
@@ -638,14 +761,56 @@
 							}
 						],
 						"url": {
-							"raw": "{{base_url}}/v1/user/cart/remove/1",
+							"raw": "{{base_url}}/v1/wishlist/1",
 							"host": ["{{base_url}}"],
-							"path": ["v1", "user", "cart", "remove", "1"]
+							"path": ["v1", "wishlist", "1"]
 						}
 					}
 				},
 				{
-					"name": "Clear Cart",
+					"name": "Check Wishlist Status",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{auth_token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/v1/wishlist/1/check",
+							"host": ["{{base_url}}"],
+							"path": ["v1", "wishlist", "1", "check"]
+						}
+					}
+				},
+				{
+					"name": "Move to Cart",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{auth_token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/v1/wishlist/1/move-to-cart",
+							"host": ["{{base_url}}"],
+							"path": ["v1", "wishlist", "1", "move-to-cart"]
+						}
+					}
+				},
+				{
+					"name": "Clear Wishlist",
 					"request": {
 						"method": "DELETE",
 						"header": [
@@ -659,469 +824,86 @@
 							}
 						],
 						"url": {
-							"raw": "{{base_url}}/v1/user/cart/clear",
+							"raw": "{{base_url}}/v1/wishlist/clear",
 							"host": ["{{base_url}}"],
-							"path": ["v1", "user", "cart", "clear"]
+							"path": ["v1", "wishlist", "clear"]
+						}
+					}
+				},
+				{
+					"name": "Get Wishlist Count",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{auth_token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/v1/wishlist/count",
+							"host": ["{{base_url}}"],
+							"path": ["v1", "wishlist", "count"]
 						}
 					}
 				}
 			]
 		},
 		{
-			"name": "Orders (Authenticated)",
+			"name": "Categories",
 			"item": [
 				{
-					"name": "Create Order",
-					"request": {
-						"method": "POST",
-						"header": [
-							{
-								"key": "Accept",
-								"value": "application/json"
-							},
-							{
-								"key": "Content-Type",
-								"value": "application/json"
-							},
-							{
-								"key": "Authorization",
-								"value": "Bearer {{auth_token}}"
-							}
-						],
-						"body": {
-							"mode": "raw",
-							"raw": "{\n    \"ebooks\": [1, 2, 3],\n    \"payment_method\": \"stripe\",\n    \"billing_address\": {\n        \"name\": \"John Doe\",\n        \"email\": \"john@example.com\",\n        \"address\": \"123 Main St\",\n        \"city\": \"New York\",\n        \"state\": \"NY\",\n        \"zip\": \"10001\",\n        \"country\": \"US\"\n    }\n}"
-						},
-						"url": {
-							"raw": "{{base_url}}/v1/orders",
-							"host": ["{{base_url}}"],
-							"path": ["v1", "orders"]
-						}
-					}
-				},
-				{
-					"name": "Get Order Details",
+					"name": "Get All Categories",
 					"request": {
 						"method": "GET",
 						"header": [
 							{
 								"key": "Accept",
 								"value": "application/json"
-							},
-							{
-								"key": "Authorization",
-								"value": "Bearer {{auth_token}}"
 							}
 						],
 						"url": {
-							"raw": "{{base_url}}/v1/orders/1",
+							"raw": "{{base_url}}/v1/categories",
 							"host": ["{{base_url}}"],
-							"path": ["v1", "orders", "1"]
+							"path": ["v1", "categories"]
 						}
 					}
 				},
 				{
-					"name": "Get User Orders",
+					"name": "Get Category Details",
 					"request": {
 						"method": "GET",
 						"header": [
 							{
 								"key": "Accept",
 								"value": "application/json"
-							},
-							{
-								"key": "Authorization",
-								"value": "Bearer {{auth_token}}"
 							}
 						],
 						"url": {
-							"raw": "{{base_url}}/v1/user/orders",
+							"raw": "{{base_url}}/v1/categories/1",
 							"host": ["{{base_url}}"],
-							"path": ["v1", "user", "orders"]
+							"path": ["v1", "categories", "1"]
 						}
 					}
 				},
 				{
-					"name": "Get User Order Detail",
+					"name": "Get Category Resources",
 					"request": {
 						"method": "GET",
 						"header": [
 							{
 								"key": "Accept",
 								"value": "application/json"
-							},
-							{
-								"key": "Authorization",
-								"value": "Bearer {{auth_token}}"
 							}
 						],
 						"url": {
-							"raw": "{{base_url}}/v1/user/orders/1",
+							"raw": "{{base_url}}/v1/categories/1/resources",
 							"host": ["{{base_url}}"],
-							"path": ["v1", "user", "orders", "1"]
-						}
-					}
-				},
-				{
-					"name": "Checkout",
-					"request": {
-						"method": "POST",
-						"header": [
-							{
-								"key": "Accept",
-								"value": "application/json"
-							},
-							{
-								"key": "Content-Type",
-								"value": "application/json"
-							},
-							{
-								"key": "Authorization",
-								"value": "Bearer {{auth_token}}"
-							}
-						],
-						"body": {
-							"mode": "raw",
-							"raw": "{\n    \"ebooks\": [1, 2, 3],\n    \"payment_method\": \"stripe\",\n    \"billing_address\": {\n        \"name\": \"John Doe\",\n        \"email\": \"john@example.com\",\n        \"address\": \"123 Main St\",\n        \"city\": \"New York\",\n        \"state\": \"NY\",\n        \"zip\": \"10001\",\n        \"country\": \"US\"\n    }\n}"
-						},
-						"url": {
-							"raw": "{{base_url}}/v1/checkout",
-							"host": ["{{base_url}}"],
-							"path": ["v1", "checkout"]
-						}
-					}
-				}
-			]
-		},
-		{
-			"name": "Reviews (Authenticated)",
-			"item": [
-				{
-					"name": "Get Ebook Reviews",
-					"request": {
-						"method": "GET",
-						"header": [
-							{
-								"key": "Accept",
-								"value": "application/json"
-							},
-							{
-								"key": "Authorization",
-								"value": "Bearer {{auth_token}}"
-							}
-						],
-						"url": {
-							"raw": "{{base_url}}/v1/ebooks/1/reviews",
-							"host": ["{{base_url}}"],
-							"path": ["v1", "ebooks", "1", "reviews"]
-						}
-					}
-				},
-				{
-					"name": "Create Review",
-					"request": {
-						"method": "POST",
-						"header": [
-							{
-								"key": "Accept",
-								"value": "application/json"
-							},
-							{
-								"key": "Content-Type",
-								"value": "application/json"
-							},
-							{
-								"key": "Authorization",
-								"value": "Bearer {{auth_token}}"
-							}
-						],
-						"body": {
-							"mode": "raw",
-							"raw": "{\n    \"rating\": 5,\n    \"comment\": \"Excellent book! Very informative.\"\n}"
-						},
-						"url": {
-							"raw": "{{base_url}}/v1/ebooks/1/reviews",
-							"host": ["{{base_url}}"],
-							"path": ["v1", "ebooks", "1", "reviews"]
-						}
-					}
-				},
-				{
-					"name": "Update Review",
-					"request": {
-						"method": "PUT",
-						"header": [
-							{
-								"key": "Accept",
-								"value": "application/json"
-							},
-							{
-								"key": "Content-Type",
-								"value": "application/json"
-							},
-							{
-								"key": "Authorization",
-								"value": "Bearer {{auth_token}}"
-							}
-						],
-						"body": {
-							"mode": "raw",
-							"raw": "{\n    \"rating\": 4,\n    \"comment\": \"Updated review comment.\"\n}"
-						},
-						"url": {
-							"raw": "{{base_url}}/v1/ebooks/1/reviews/1",
-							"host": ["{{base_url}}"],
-							"path": ["v1", "ebooks", "1", "reviews", "1"]
-						}
-					}
-				},
-				{
-					"name": "Delete Review",
-					"request": {
-						"method": "DELETE",
-						"header": [
-							{
-								"key": "Accept",
-								"value": "application/json"
-							},
-							{
-								"key": "Authorization",
-								"value": "Bearer {{auth_token}}"
-							}
-						],
-						"url": {
-							"raw": "{{base_url}}/v1/ebooks/1/reviews/1",
-							"host": ["{{base_url}}"],
-							"path": ["v1", "ebooks", "1", "reviews", "1"]
-						}
-					}
-				}
-			]
-		},
-		{
-			"name": "Admin - Ebook Management",
-			"item": [
-				{
-					"name": "List All Ebooks (Admin)",
-					"request": {
-						"method": "GET",
-						"header": [
-							{
-								"key": "Accept",
-								"value": "application/json"
-							},
-							{
-								"key": "Authorization",
-								"value": "Bearer {{admin_token}}"
-							}
-						],
-						"url": {
-							"raw": "{{base_url}}/v1/admin/ebooks",
-							"host": ["{{base_url}}"],
-							"path": ["v1", "admin", "ebooks"]
-						}
-					}
-				},
-				{
-					"name": "Create Ebook (Admin)",
-					"request": {
-						"method": "POST",
-						"header": [
-							{
-								"key": "Accept",
-								"value": "application/json"
-							},
-							{
-								"key": "Content-Type",
-								"value": "application/json"
-							},
-							{
-								"key": "Authorization",
-								"value": "Bearer {{admin_token}}"
-							}
-						],
-						"body": {
-							"mode": "raw",
-							"raw": "{\n    \"title\": \"New Ebook Title\",\n    \"description\": \"Ebook description\",\n    \"price\": \"29.99\",\n    \"cover_image\": \"base64_encoded_image_or_url\",\n    \"is_published\": true\n}"
-						},
-						"url": {
-							"raw": "{{base_url}}/v1/admin/ebooks",
-							"host": ["{{base_url}}"],
-							"path": ["v1", "admin", "ebooks"]
-						}
-					}
-				},
-				{
-					"name": "Update Ebook (Admin)",
-					"request": {
-						"method": "PUT",
-						"header": [
-							{
-								"key": "Accept",
-								"value": "application/json"
-							},
-							{
-								"key": "Content-Type",
-								"value": "application/json"
-							},
-							{
-								"key": "Authorization",
-								"value": "Bearer {{admin_token}}"
-							}
-						],
-						"body": {
-							"mode": "raw",
-							"raw": "{\n    \"title\": \"Updated Ebook Title\",\n    \"description\": \"Updated description\",\n    \"price\": \"39.99\",\n    \"cover_image\": \"base64_encoded_image_or_url\",\n    \"is_published\": true\n}"
-						},
-						"url": {
-							"raw": "{{base_url}}/v1/admin/ebooks/1",
-							"host": ["{{base_url}}"],
-							"path": ["v1", "admin", "ebooks", "1"]
-						}
-					}
-				},
-				{
-					"name": "Delete Ebook (Admin)",
-					"request": {
-						"method": "DELETE",
-						"header": [
-							{
-								"key": "Accept",
-								"value": "application/json"
-							},
-							{
-								"key": "Authorization",
-								"value": "Bearer {{admin_token}}"
-							}
-						],
-						"url": {
-							"raw": "{{base_url}}/v1/admin/ebooks/1",
-							"host": ["{{base_url}}"],
-							"path": ["v1", "admin", "ebooks", "1"]
-						}
-					}
-				},
-				{
-					"name": "Publish Ebook (Admin)",
-					"request": {
-						"method": "POST",
-						"header": [
-							{
-								"key": "Accept",
-								"value": "application/json"
-							},
-							{
-								"key": "Authorization",
-								"value": "Bearer {{admin_token}}"
-							}
-						],
-						"url": {
-							"raw": "{{base_url}}/v1/admin/ebooks/1/publish",
-							"host": ["{{base_url}}"],
-							"path": ["v1", "admin", "ebooks", "1", "publish"]
-						}
-					}
-				},
-				{
-					"name": "Unpublish Ebook (Admin)",
-					"request": {
-						"method": "POST",
-						"header": [
-							{
-								"key": "Accept",
-								"value": "application/json"
-							},
-							{
-								"key": "Authorization",
-								"value": "Bearer {{admin_token}}"
-							}
-						],
-						"url": {
-							"raw": "{{base_url}}/v1/admin/ebooks/1/unpublish",
-							"host": ["{{base_url}}"],
-							"path": ["v1", "admin", "ebooks", "1", "unpublish"]
-						}
-					}
-				}
-			]
-		},
-		{
-			"name": "Admin - Analytics",
-			"item": [
-				{
-					"name": "Sales Analytics (Admin)",
-					"request": {
-						"method": "GET",
-						"header": [
-							{
-								"key": "Accept",
-								"value": "application/json"
-							},
-							{
-								"key": "Authorization",
-								"value": "Bearer {{admin_token}}"
-							}
-						],
-						"url": {
-							"raw": "{{base_url}}/v1/admin/analytics/sales?period=monthly&start_date=2025-01-01&end_date=2025-12-31",
-							"host": ["{{base_url}}"],
-							"path": ["v1", "admin", "analytics", "sales"],
-							"query": [
-								{
-									"key": "period",
-									"value": "monthly"
-								},
-								{
-									"key": "start_date",
-									"value": "2025-01-01"
-								},
-								{
-									"key": "end_date",
-									"value": "2025-12-31"
-								}
-							]
-						}
-					}
-				},
-				{
-					"name": "Ebook Analytics (Admin)",
-					"request": {
-						"method": "GET",
-						"header": [
-							{
-								"key": "Accept",
-								"value": "application/json"
-							},
-							{
-								"key": "Authorization",
-								"value": "Bearer {{admin_token}}"
-							}
-						],
-						"url": {
-							"raw": "{{base_url}}/v1/admin/analytics/ebooks",
-							"host": ["{{base_url}}"],
-							"path": ["v1", "admin", "analytics", "ebooks"]
-						}
-					}
-				},
-				{
-					"name": "User Analytics (Admin)",
-					"request": {
-						"method": "GET",
-						"header": [
-							{
-								"key": "Accept",
-								"value": "application/json"
-							},
-							{
-								"key": "Authorization",
-								"value": "Bearer {{admin_token}}"
-							}
-						],
-						"url": {
-							"raw": "{{base_url}}/v1/admin/analytics/users",
-							"host": ["{{base_url}}"],
-							"path": ["v1", "admin", "analytics", "users"]
+							"path": ["v1", "categories", "1", "resources"]
 						}
 					}
 				}
@@ -1137,11 +919,6 @@
 		{
 			"key": "auth_token",
 			"value": "your_auth_token_here",
-			"type": "string"
-		},
-		{
-			"key": "admin_token",
-			"value": "your_admin_token_here",
 			"type": "string"
 		}
 	]

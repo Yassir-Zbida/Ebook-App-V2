@@ -2,7 +2,7 @@
 
 ## Overview
 
-This API provides endpoints for managing an ebook ecommerce platform. It includes user authentication, ebook browsing, shopping cart management, wishlist functionality, and order processing.
+This API provides endpoints for managing an ebook ecommerce platform. It includes user authentication, ebook browsing, shopping cart management, wishlist functionality, order processing, and reviews system.
 
 ## Base URL
 
@@ -231,10 +231,13 @@ Get user's shopping cart with all items.
                 "ebook": {
                     "id": 1,
                     "title": "Sample Ebook",
+                    "description": "A great ebook",
                     "price": "29.99",
-                    "cover_image": "http://localhost:8000/storage/ebooks/covers/sample.jpg"
+                    "cover_image": "http://localhost:8000/storage/ebooks/covers/sample.jpg",
+                    "is_active": true,
+                    "created_at": "2025-06-21T10:00:00.000000Z",
+                    "updated_at": "2025-06-21T10:00:00.000000Z"
                 },
-                "quantity": 1,
                 "price": "29.99",
                 "discount_amount": "0.00",
                 "subtotal": "29.99"
@@ -255,26 +258,28 @@ Get user's shopping cart with all items.
 
 **POST** `/cart/add`
 
-Add an ebook to the shopping cart.
+Add an ebook to the shopping cart. Note: Only one copy of each ebook can be added to cart.
 
 **Request Body:**
 ```json
 {
-    "ebook_id": 1,
-    "quantity": 1
+    "ebook_id": 1
 }
 ```
 
-### Update Cart Item
-
-**PUT** `/cart/items/{itemId}`
-
-Update quantity of a cart item.
-
-**Request Body:**
+**Response:**
 ```json
 {
-    "quantity": 2
+    "success": true,
+    "message": "Item added to cart successfully"
+}
+```
+
+**Error Response (if already in cart):**
+```json
+{
+    "success": false,
+    "message": "Item already exists in cart"
 }
 ```
 
@@ -283,6 +288,14 @@ Update quantity of a cart item.
 **DELETE** `/cart/items/{itemId}`
 
 Remove an item from the cart.
+
+**Response:**
+```json
+{
+    "success": true,
+    "message": "Item removed from cart successfully"
+}
+```
 
 ### Clear Cart
 
@@ -430,11 +443,77 @@ Change user's password.
 
 Get user's order history.
 
+**Response:**
+```json
+{
+    "success": true,
+    "data": {
+        "data": [
+            {
+                "order_id": 1,
+                "order_number": "ORD-1732312345-1",
+                "status": "completed",
+                "total_amount": "29.99",
+                "items_count": 1,
+                "created_at": "2025-06-22T10:00:00.000000Z",
+                "items": [
+                    {
+                        "id": 1,
+                        "ebook_id": 1,
+                        "ebook_title": "Sample Ebook",
+                        "price": "29.99",
+                        "subtotal": "29.99"
+                    }
+                ]
+            }
+        ],
+        "current_page": 1,
+        "per_page": 12,
+        "total": 5
+    }
+}
+```
+
 ### Get Order Details
 
 **GET** `/user/orders/{orderId}`
 
 Get detailed information about a specific order.
+
+**Response:**
+```json
+{
+    "success": true,
+    "data": {
+        "order_id": 1,
+        "order_number": "ORD-1732312345-1",
+        "status": "completed",
+        "subtotal": "29.99",
+        "discount_amount": "0.00",
+        "tax_amount": "0.00",
+        "total_amount": "29.99",
+        "payment_method": "stripe",
+        "payment_status": "completed",
+        "created_at": "2025-06-22T10:00:00.000000Z",
+        "completed_at": "2025-06-22T10:05:00.000000Z",
+        "items": [
+            {
+                "id": 1,
+                "ebook_id": 1,
+                "ebook_title": "Sample Ebook",
+                "price": "29.99",
+                "subtotal": "29.99",
+                "ebook": {
+                    "id": 1,
+                    "title": "Sample Ebook",
+                    "description": "A great ebook",
+                    "cover_image": "http://localhost:8000/storage/ebooks/covers/sample.jpg"
+                }
+            }
+        ]
+    }
+}
+```
 
 ### Checkout
 
@@ -445,7 +524,163 @@ Process checkout from cart.
 **Request Body:**
 ```json
 {
-    "payment_method": "stripe"
+    "payment_method": "stripe",
+    "billing_info": {
+        "name": "John Doe",
+        "email": "john@example.com",
+        "address": "123 Main St"
+    }
+}
+```
+
+**Response:**
+```json
+{
+    "success": true,
+    "message": "Order placed successfully",
+    "data": {
+        "order_id": 1,
+        "order_number": "ORD-1732312345-1",
+        "total_amount": "29.99",
+        "items_count": 1,
+        "status": "pending",
+        "created_at": "2025-06-22T10:00:00.000000Z"
+    }
+}
+```
+
+---
+
+## Reviews Endpoints
+
+### Get Ebook Reviews *(Public)*
+
+**GET** `/ebooks/{ebookId}/reviews`
+
+Get all reviews for a specific ebook.
+
+**Response:**
+```json
+{
+    "success": true,
+    "data": {
+        "reviews": {
+            "data": [
+                {
+                    "id": 1,
+                    "rating": 5,
+                    "review": "Excellent ebook!",
+                    "created_at": "2025-06-22T10:00:00.000000Z",
+                    "user": {
+                        "id": 1,
+                        "name": "John Doe"
+                    }
+                }
+            ],
+            "current_page": 1,
+            "per_page": 10,
+            "total": 5
+        },
+        "summary": {
+            "average_rating": 4.5,
+            "total_reviews": 5
+        }
+    }
+}
+```
+
+### Submit Review *(Requires Authentication)*
+
+**POST** `/ebooks/{ebookId}/reviews`
+
+Submit a review for an ebook. Only users who have purchased the ebook can review it.
+
+**Request Body:**
+```json
+{
+    "rating": 5,
+    "review": "Excellent ebook with great content!"
+}
+```
+
+**Response:**
+```json
+{
+    "success": true,
+    "message": "Review submitted successfully",
+    "data": {
+        "id": 1,
+        "rating": 5,
+        "review": "Excellent ebook with great content!",
+        "created_at": "2025-06-22T10:00:00.000000Z"
+    }
+}
+```
+
+**Error Response (if not purchased):**
+```json
+{
+    "success": false,
+    "message": "You can only review ebooks you have purchased"
+}
+```
+
+### Update Review *(Requires Authentication)*
+
+**PUT** `/reviews/{reviewId}`
+
+Update your own review.
+
+**Request Body:**
+```json
+{
+    "rating": 4,
+    "review": "Updated review text"
+}
+```
+
+### Delete Review *(Requires Authentication)*
+
+**DELETE** `/reviews/{reviewId}`
+
+Delete your own review.
+
+**Response:**
+```json
+{
+    "success": true,
+    "message": "Review deleted successfully"
+}
+```
+
+### Get User Reviews *(Requires Authentication)*
+
+**GET** `/user/reviews`
+
+Get all reviews submitted by the current user.
+
+**Response:**
+```json
+{
+    "success": true,
+    "data": {
+        "data": [
+            {
+                "id": 1,
+                "rating": 5,
+                "review": "Great ebook!",
+                "created_at": "2025-06-22T10:00:00.000000Z",
+                "ebook": {
+                    "id": 1,
+                    "title": "Sample Ebook",
+                    "cover_image": "http://localhost:8000/storage/ebooks/covers/sample.jpg"
+                }
+            }
+        ],
+        "current_page": 1,
+        "per_page": 10,
+        "total": 3
+    }
 }
 ```
 

@@ -13,7 +13,6 @@ class CartItem extends Model
     protected $fillable = [
         'cart_id',
         'ebook_id',
-        'quantity',
         'price',
         'discount_amount',
         'subtotal',
@@ -48,7 +47,7 @@ class CartItem extends Model
      */
     public function calculateSubtotal(): void
     {
-        $this->subtotal = ($this->price * $this->quantity) - $this->discount_amount;
+        $this->subtotal = $this->price - $this->discount_amount;
         $this->save();
     }
 } 

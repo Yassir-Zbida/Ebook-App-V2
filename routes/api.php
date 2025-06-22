@@ -10,6 +10,7 @@ use App\Http\Controllers\Api\OrderController;
 use App\Http\Controllers\Api\UserController;
 use App\Http\Controllers\Api\CartController;
 use App\Http\Controllers\Api\WishlistController;
+use App\Http\Controllers\Api\ReviewController;
 
 /*
 |--------------------------------------------------------------------------
@@ -46,6 +47,9 @@ Route::prefix('v1')->group(function () {
     // Featured and popular content
     Route::get('/featured/ebooks', [EbookController::class, 'featured']);
     Route::get('/popular/ebooks', [EbookController::class, 'popular']);
+    
+    // Public reviews (read-only)
+    Route::get('/ebooks/{ebook}/reviews', [ReviewController::class, 'index']);
 });
 
 // Protected routes (authentication required)
@@ -70,7 +74,6 @@ Route::prefix('v1')->middleware('auth:sanctum')->group(function () {
     // Shopping cart management
     Route::get('/cart', [CartController::class, 'index']);
     Route::post('/cart/add', [CartController::class, 'addItem']);
-    Route::put('/cart/items/{itemId}', [CartController::class, 'updateItem']);
     Route::delete('/cart/items/{itemId}', [CartController::class, 'removeItem']);
     Route::delete('/cart/clear', [CartController::class, 'clear']);
     Route::post('/cart/apply-coupon', [CartController::class, 'applyCoupon']);
@@ -90,11 +93,11 @@ Route::prefix('v1')->middleware('auth:sanctum')->group(function () {
     Route::post('/orders', [OrderController::class, 'store']);
     Route::get('/orders/{order}', [OrderController::class, 'show']);
     
-    // Reviews and ratings
-    Route::get('/ebooks/{ebook}/reviews', [EbookController::class, 'reviews']);
-    Route::post('/ebooks/{ebook}/reviews', [EbookController::class, 'storeReview']);
-    Route::put('/ebooks/{ebook}/reviews/{review}', [EbookController::class, 'updateReview']);
-    Route::delete('/ebooks/{ebook}/reviews/{review}', [EbookController::class, 'deleteReview']);
+    // Reviews and ratings (authenticated users)
+    Route::post('/ebooks/{ebook}/reviews', [ReviewController::class, 'store']);
+    Route::put('/reviews/{review}', [ReviewController::class, 'update']);
+    Route::delete('/reviews/{review}', [ReviewController::class, 'destroy']);
+    Route::get('/user/reviews', [ReviewController::class, 'userReviews']);
 });
 
 // Admin routes (admin role required)
