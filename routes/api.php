@@ -81,12 +81,12 @@ Route::prefix('v1')->middleware('auth:sanctum')->group(function () {
     
     // Wishlist management
     Route::get('/wishlist', [WishlistController::class, 'index']);
+    Route::delete('/wishlist/clear', [WishlistController::class, 'clear']);
+    Route::get('/wishlist/count', [WishlistController::class, 'count']);
     Route::post('/wishlist/{ebook}', [WishlistController::class, 'add']);
     Route::delete('/wishlist/{ebook}', [WishlistController::class, 'remove']);
     Route::get('/wishlist/{ebook}/check', [WishlistController::class, 'check']);
     Route::post('/wishlist/{ebook}/move-to-cart', [WishlistController::class, 'moveToCart']);
-    Route::delete('/wishlist/clear', [WishlistController::class, 'clear']);
-    Route::get('/wishlist/count', [WishlistController::class, 'count']);
     
     // Checkout and purchase
     Route::post('/checkout', [OrderController::class, 'checkout']);
