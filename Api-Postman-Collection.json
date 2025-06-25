@@ -513,6 +513,145 @@
 			]
 		},
 		{
+			"name": "Stripe Payments (Authenticated)",
+			"item": [
+				{
+					"name": "Create Payment Intent",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{auth_token}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"order_id\": 1,\n    \"customer_data\": {\n        \"address\": {\n            \"line1\": \"123 Main St\",\n            \"city\": \"New York\",\n            \"state\": \"NY\",\n            \"postal_code\": \"10001\",\n            \"country\": \"US\"\n        },\n        \"phone\": \"+1234567890\"\n    }\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/v1/stripe/payment-intent",
+							"host": ["{{base_url}}"],
+							"path": ["v1", "stripe", "payment-intent"]
+						}
+					}
+				},
+				{
+					"name": "Confirm Payment",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{auth_token}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"payment_intent_id\": \"pi_1234567890\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/v1/stripe/confirm-payment",
+							"host": ["{{base_url}}"],
+							"path": ["v1", "stripe", "confirm-payment"]
+						}
+					}
+				},
+				{
+					"name": "Get Payment Status",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{auth_token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/v1/stripe/payment-status/pi_1234567890",
+							"host": ["{{base_url}}"],
+							"path": ["v1", "stripe", "payment-status", "pi_1234567890"]
+						}
+					}
+				},
+				{
+					"name": "Get Payment Methods",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{auth_token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/v1/stripe/payment-methods",
+							"host": ["{{base_url}}"],
+							"path": ["v1", "stripe", "payment-methods"]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "Stripe Webhooks (No Auth)",
+			"item": [
+				{
+					"name": "Stripe Webhook",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Stripe-Signature",
+								"value": "t=1234567890,v1=signature_here"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"id\": \"evt_1234567890\",\n    \"object\": \"event\",\n    \"type\": \"payment_intent.succeeded\",\n    \"data\": {\n        \"object\": {\n            \"id\": \"pi_1234567890\",\n            \"object\": \"payment_intent\",\n            \"status\": \"succeeded\",\n            \"amount\": 2000,\n            \"currency\": \"usd\"\n        }\n    }\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/v1/stripe/webhook",
+							"host": ["{{base_url}}"],
+							"path": ["v1", "stripe", "webhook"]
+						}
+					}
+				}
+			]
+		},
+		{
 			"name": "Reviews (Authenticated)",
 			"item": [
 				{

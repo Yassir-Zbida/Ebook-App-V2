@@ -9,12 +9,19 @@ use App\Models\Order;
 use App\Models\OrderItem;
 use App\Models\Cart;
 use App\Models\CartItem;
+use App\Services\StripeService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
 
 class OrderController extends Controller
 {
+    protected $stripeService;
+
+    public function __construct(StripeService $stripeService)
+    {
+        $this->stripeService = $stripeService;
+    }
     /**
      * Get user's order history
      */
@@ -176,7 +183,7 @@ class OrderController extends Controller
     {
         $validator = Validator::make($request->all(), [
             'payment_method' => 'required|string|in:stripe,paypal,cash',
-            'billing_info' => 'nullable|array',
+            // 'billing_info' => 'nullable|array',
         ]);
 
         if ($validator->fails()) {
@@ -245,36 +252,70 @@ class OrderController extends Controller
                 ]);
             }
 
-            // Create purchase records in user_ebooks table
-            foreach ($cart->items as $cartItem) {
-                DB::table('user_ebooks')->insert([
-                    'user_id' => $user->id,
-                    'ebook_id' => $cartItem->ebook_id,
-                    'purchase_price' => $cartItem->price,
-                    'purchased_at' => now(),
-                    'created_at' => now(),
-                    'updated_at' => now(),
+            // Handle payment processing based on method
+            if ($request->payment_method === 'stripe') {
+                // For Stripe, we create the order but don't complete it until payment is confirmed
+                // The frontend will need to call the Stripe payment intent endpoint
+                
+                DB::commit();
+
+                return response()->json([
+                    'success' => true,
+                    'message' => 'Order created successfully. Please complete payment.',
+                    'data' => [
+                        'order_id' => $order->id,
+                        'order_number' => $order->order_number,
+                        'total_amount' => $order->total_amount,
+                        'items_count' => $order->items->count(),
+                        'status' => $order->status,
+                        'payment_method' => $order->payment_method,
+                        'payment_status' => $order->payment_status,
+                        'created_at' => $order->created_at,
+                        'next_step' => 'Create payment intent using /v1/stripe/payment-intent endpoint'
+                    ]
+                ], 201);
+            } else {
+                // For other payment methods (cash, etc.), complete the order immediately
+                // Create purchase records in user_ebooks table
+                foreach ($cart->items as $cartItem) {
+                    DB::table('user_ebooks')->insert([
+                        'user_id' => $user->id,
+                        'ebook_id' => $cartItem->ebook_id,
+                        'purchase_price' => $cartItem->price,
+                        'purchased_at' => now(),
+                        'created_at' => now(),
+                        'updated_at' => now(),
+                    ]);
+                }
+
+                // Update order status
+                $order->update([
+                    'status' => 'completed',
+                    'payment_status' => 'paid',
+                    'completed_at' => now(),
                 ]);
+
+                // Clear the cart
+                $cart->items()->delete();
+                $cart->delete();
+
+                DB::commit();
+
+                return response()->json([
+                    'success' => true,
+                    'message' => 'Order placed successfully',
+                    'data' => [
+                        'order_id' => $order->id,
+                        'order_number' => $order->order_number,
+                        'total_amount' => $order->total_amount,
+                        'items_count' => $order->items->count(),
+                        'status' => $order->status,
+                        'payment_status' => $order->payment_status,
+                        'created_at' => $order->created_at,
+                        'completed_at' => $order->completed_at,
+                    ]
+                ], 201);
             }
-
-            // Clear the cart
-            $cart->items()->delete();
-            $cart->delete();
-
-            DB::commit();
-
-            return response()->json([
-                'success' => true,
-                'message' => 'Order placed successfully',
-                'data' => [
-                    'order_id' => $order->id,
-                    'order_number' => $order->order_number,
-                    'total_amount' => $order->total_amount,
-                    'items_count' => $order->items->count(),
-                    'status' => $order->status,
-                    'created_at' => $order->created_at,
-                ]
-            ], 201);
 
         } catch (\Exception $e) {
             DB::rollBack();

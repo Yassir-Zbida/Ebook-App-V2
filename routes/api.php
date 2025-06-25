@@ -98,6 +98,14 @@ Route::prefix('v1')->middleware('auth:sanctum')->group(function () {
     Route::put('/reviews/{review}', [ReviewController::class, 'update']);
     Route::delete('/reviews/{review}', [ReviewController::class, 'destroy']);
     Route::get('/user/reviews', [ReviewController::class, 'userReviews']);
+
+    // Stripe Payment Routes
+    Route::prefix('stripe')->group(function () {
+        Route::post('/payment-intent', [\App\Http\Controllers\Api\StripeController::class, 'createPaymentIntent']);
+        Route::post('/confirm-payment', [\App\Http\Controllers\Api\StripeController::class, 'confirmPayment']);
+        Route::get('/payment-status/{paymentIntentId}', [\App\Http\Controllers\Api\StripeController::class, 'getPaymentStatus']);
+        Route::get('/payment-methods', [\App\Http\Controllers\Api\StripeController::class, 'getPaymentMethods']);
+    });
 });
 
 // Admin routes (admin role required)
@@ -131,6 +139,9 @@ Route::prefix('v1/admin')->middleware(['auth:sanctum', 'role:admin'])->group(fun
     Route::get('/analytics/ebooks', [\App\Http\Controllers\Api\Admin\AnalyticsController::class, 'ebooks']);
     Route::get('/analytics/users', [\App\Http\Controllers\Api\Admin\AnalyticsController::class, 'users']);
 });
+
+// Stripe Webhook (No authentication required)
+Route::post('/v1/stripe/webhook', [\App\Http\Controllers\Api\StripeController::class, 'webhook']);
 
 // Health check endpoint
 Route::get('/health', function () {

@@ -75,6 +75,44 @@ class Transaction extends Model
     }
 
     /**
+     * Complete purchase by adding ebooks to user's library
+     */
+    public function completePurchase(): void
+    {
+        if ($this->status !== 'completed' || !$this->order) {
+            return;
+        }
+
+        // Add ebooks to user's library
+        foreach ($this->order->items as $orderItem) {
+            \DB::table('user_ebooks')->updateOrInsert(
+                [
+                    'user_id' => $this->user_id,
+                    'ebook_id' => $orderItem->ebook_id,
+                ],
+                [
+                    'purchase_price' => $orderItem->price,
+                    'purchased_at' => now(),
+                    'created_at' => now(),
+                    'updated_at' => now(),
+                ]
+            );
+        }
+
+        // Clear user's cart if it contains the purchased items
+        $cart = \App\Models\Cart::where('session_id', $this->user_id)->first();
+        if ($cart) {
+            $purchasedEbookIds = $this->order->items->pluck('ebook_id')->toArray();
+            $cart->items()->whereIn('ebook_id', $purchasedEbookIds)->delete();
+            
+            // If cart is empty, delete it
+            if ($cart->items()->count() === 0) {
+                $cart->delete();
+            }
+        }
+    }
+
+    /**
      * Mark transaction as failed
      */
     public function markAsFailed(string $reason = null): void
