@@ -420,6 +420,15 @@
                         <span class="font-medium">Clients</span>
                     </a>
 
+                    <!-- Coupons -->
+                    <a href="{{ route('admin.coupons.index') }}"
+                        class="menu-item flex items-center space-x-3 px-4 py-3 rounded-xl text-sidebar-text dark:text-sidebar-text-dark hover:bg-sidebar-hover dark:hover:bg-sidebar-hover-dark group transition-all duration-200 {{ request()->routeIs('admin.coupons.*') ? 'menu-item-active bg-primary' : '' }}">
+                        <div class="w-5 h-5 flex items-center justify-center">
+                            <i class="ri-ticket-line text-lg"></i>
+                        </div>
+                        <span class="font-medium">Coupons</span>
+                    </a>
+
                     <!-- Marketing with Enhanced Submenu -->
                     <div x-data="{ open: activeSubmenu === 'marketing' }"
                         x-init="$watch('open', val => activeSubmenu = val ? 'marketing' : null)">
@@ -445,10 +454,7 @@
                                 <i class="ri-percent-line text-base group-hover:scale-110 transition-transform"></i>
                                 <span>Promotions</span>
                             </a>
-                            <a href="#" class="flex items-center space-x-3 px-3 py-2 text-sm text-sidebar-text-muted dark:text-sidebar-text-muted-dark hover:text-primary hover:bg-primary/5 rounded-lg transition-all duration-200 group">
-                                <i class="ri-coupon-line text-base group-hover:scale-110 transition-transform"></i>
-                                <span>Coupons</span>
-                            </a>
+
                         </div>
                     </div>
 

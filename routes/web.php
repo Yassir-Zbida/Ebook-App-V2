@@ -55,6 +55,13 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->grou
     Route::get('customers/{customer}/details', [\App\Http\Controllers\Admin\CustomerController::class, 'getCustomerDetails'])->name('customers.details');
     Route::get('customers/{customer}/orders', [\App\Http\Controllers\Admin\CustomerController::class, 'getCustomerOrders'])->name('customers.orders');
     Route::get('customers/stats', [\App\Http\Controllers\Admin\CustomerController::class, 'getStats'])->name('customers.stats');
+    
+    // Coupon management
+    Route::resource('coupons', \App\Http\Controllers\Admin\CouponController::class);
+    Route::patch('coupons/{coupon}/toggle-status', [\App\Http\Controllers\Admin\CouponController::class, 'toggleStatus'])->name('coupons.toggle-status');
+    Route::get('coupons/{coupon}/details', [\App\Http\Controllers\Admin\CouponController::class, 'getCouponDetails'])->name('coupons.details');
+    Route::get('coupons/generate-code', [\App\Http\Controllers\Admin\CouponController::class, 'generateCode'])->name('coupons.generate-code');
+    Route::get('coupons/stats', [\App\Http\Controllers\Admin\CouponController::class, 'getStats'])->name('coupons.stats');
 });
 
 // Debug route to test form submission
