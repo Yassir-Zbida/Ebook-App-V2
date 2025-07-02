@@ -96,6 +96,38 @@ class User extends Authenticatable
     }
 
     /**
+     * Get the orders for the user
+     */
+    public function orders()
+    {
+        return $this->hasMany(Order::class);
+    }
+
+    /**
+     * Get user's total orders count
+     */
+    public function getTotalOrdersAttribute(): int
+    {
+        return $this->orders()->count();
+    }
+
+    /**
+     * Get user's total spent
+     */
+    public function getTotalSpentAttribute(): float
+    {
+        return $this->orders()->where('status', 'completed')->sum('total_amount');
+    }
+
+    /**
+     * Get user's last order
+     */
+    public function getLastOrderAttribute()
+    {
+        return $this->orders()->latest()->first();
+    }
+
+    /**
      * Scope to get only admin users
      */
     public function scopeAdmins($query)

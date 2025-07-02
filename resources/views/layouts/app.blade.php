@@ -402,8 +402,8 @@
                     </div>
 
                     <!-- Commandes -->
-                    <a href="#"
-                        class="menu-item flex items-center space-x-3 px-4 py-3 rounded-xl text-sidebar-text dark:text-sidebar-text-dark hover:bg-sidebar-hover dark:hover:bg-sidebar-hover-dark group transition-all duration-200">
+                    <a href="{{ route('admin.orders.index') }}"
+                        class="menu-item flex items-center space-x-3 px-4 py-3 rounded-xl text-sidebar-text dark:text-sidebar-text-dark hover:bg-sidebar-hover dark:hover:bg-sidebar-hover-dark group transition-all duration-200 {{ request()->routeIs('admin.orders.*') ? 'menu-item-active bg-primary' : '' }}">
                         <div class="w-5 h-5 flex items-center justify-center">
                             <i class="ri-shopping-bag-2-line text-lg"></i>
                         </div>
@@ -412,8 +412,8 @@
                     </a>
 
                     <!-- Clients -->
-                    <a href="#"
-                        class="menu-item flex items-center space-x-3 px-4 py-3 rounded-xl text-sidebar-text dark:text-sidebar-text-dark hover:bg-sidebar-hover dark:hover:bg-sidebar-hover-dark group transition-all duration-200">
+                    <a href="{{ route('admin.customers.index') }}"
+                        class="menu-item flex items-center space-x-3 px-4 py-3 rounded-xl text-sidebar-text dark:text-sidebar-text-dark hover:bg-sidebar-hover dark:hover:bg-sidebar-hover-dark group transition-all duration-200 {{ request()->routeIs('admin.customers.*') ? 'menu-item-active bg-primary' : '' }}">
                         <div class="w-5 h-5 flex items-center justify-center">
                             <i class="ri-user-line text-lg"></i>
                         </div>
