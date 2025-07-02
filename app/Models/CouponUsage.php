@@ -30,7 +30,7 @@ class CouponUsage extends Model
     }
 
     /**
-     * Get the user that used the coupon
+     * Get the user that owns the usage
      */
     public function user(): BelongsTo
     {
@@ -38,10 +38,26 @@ class CouponUsage extends Model
     }
 
     /**
-     * Get the order where the coupon was used
+     * Get the order that owns the usage
      */
     public function order(): BelongsTo
     {
         return $this->belongsTo(Order::class);
+    }
+
+    /**
+     * Get formatted discount amount
+     */
+    public function getFormattedDiscountAmountAttribute(): string
+    {
+        return number_format($this->discount_amount, 2) . ' €';
+    }
+
+    /**
+     * Get formatted usage date
+     */
+    public function getFormattedUsageDateAttribute(): string
+    {
+        return $this->created_at->format('d/m/Y à H:i');
     }
 } 

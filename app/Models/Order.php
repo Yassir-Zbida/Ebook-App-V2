@@ -29,14 +29,15 @@ class Order extends Model
     ];
 
     protected $casts = [
+        'billing_info' => 'array',
+        'completed_at' => 'datetime',
         'subtotal' => 'decimal:2',
         'discount_amount' => 'decimal:2',
         'tax_amount' => 'decimal:2',
         'total_amount' => 'decimal:2',
         'coupon_discount' => 'decimal:2',
-        'billing_info' => 'array',
-        'completed_at' => 'datetime',
     ];
+    
 
     /**
      * Get the user that owns the order
@@ -49,58 +50,105 @@ class Order extends Model
     /**
      * Get the order items for the order
      */
-    public function items(): HasMany
+    public function orderItems(): HasMany
     {
         return $this->hasMany(OrderItem::class);
     }
 
     /**
-     * Get the transactions for the order
+     * Get the ebooks in this order
      */
-    public function transactions(): HasMany
+    public function ebooks()
     {
-        return $this->hasMany(Transaction::class);
+        return $this->belongsToMany(Ebook::class, 'order_items')
+            ->withPivot('ebook_title', 'price', 'quantity', 'discount_amount', 'subtotal')
+            ->withTimestamps();
     }
 
     /**
-     * Get the coupon usage for this order
+     * Scope to filter by status
      */
-    public function couponUsage(): HasMany
+    public function scopeByStatus($query, $status)
     {
-        return $this->hasMany(CouponUsage::class);
+        return $query->where('status', $status);
     }
 
     /**
-     * Generate a unique order number
+     * Scope to filter by payment status
      */
-    public static function generateOrderNumber(): string
+    public function scopeByPaymentStatus($query, $paymentStatus)
     {
-        do {
-            $orderNumber = 'ORD-' . date('Ymd') . '-' . strtoupper(uniqid());
-        } while (static::where('order_number', $orderNumber)->exists());
-
-        return $orderNumber;
+        return $query->where('payment_status', $paymentStatus);
     }
 
     /**
-     * Calculate order totals
+     * Scope to filter by date range
      */
-    public function calculateTotals(): void
+    public function scopeByDateRange($query, $startDate, $endDate)
     {
-        $this->subtotal = $this->items->sum('subtotal');
-        $this->total_amount = $this->subtotal - $this->discount_amount + $this->tax_amount;
-        $this->save();
+        return $query->whereBetween('created_at', [$startDate, $endDate]);
     }
 
     /**
-     * Mark order as completed
+     * Scope to filter by user
      */
-    public function markAsCompleted(): void
+    public function scopeByUser($query, $userId)
     {
-        $this->update([
-            'status' => 'completed',
-            'completed_at' => now(),
-        ]);
+        return $query->where('user_id', $userId);
+    }
+
+    /**
+     * Get status badge class for display
+     */
+    public function getStatusBadgeClassAttribute(): string
+    {
+        return match($this->status) {
+            'pending' => 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/20 dark:text-yellow-400',
+            'processing' => 'bg-blue-100 text-blue-800 dark:bg-blue-900/20 dark:text-blue-400',
+            'completed' => 'bg-green-100 text-green-800 dark:bg-green-900/20 dark:text-green-400',
+            'cancelled' => 'bg-red-100 text-red-800 dark:bg-red-900/20 dark:text-red-400',
+            'refunded' => 'bg-gray-100 text-gray-800 dark:bg-gray-900/20 dark:text-gray-400',
+            default => 'bg-gray-100 text-gray-800 dark:bg-gray-900/20 dark:text-gray-400',
+        };
+    }
+
+    /**
+     * Get payment status badge class for display
+     */
+    public function getPaymentStatusBadgeClassAttribute(): string
+    {
+        return match($this->payment_status) {
+            'pending' => 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/20 dark:text-yellow-400',
+            'processing' => 'bg-blue-100 text-blue-800 dark:bg-blue-900/20 dark:text-blue-400',
+            'completed' => 'bg-green-100 text-green-800 dark:bg-green-900/20 dark:text-green-400',
+            'failed' => 'bg-red-100 text-red-800 dark:bg-red-900/20 dark:text-red-400',
+            'cancelled' => 'bg-gray-100 text-gray-800 dark:bg-gray-900/20 dark:text-gray-400',
+            default => 'bg-gray-100 text-gray-800 dark:bg-gray-900/20 dark:text-gray-400',
+        };
+    }
+
+    /**
+     * Get formatted status name
+     */
+    public function getFormattedStatusAttribute(): string
+    {
+        return ucfirst($this->status);
+    }
+
+    /**
+     * Get formatted payment status name
+     */
+    public function getFormattedPaymentStatusAttribute(): string
+    {
+        return ucfirst($this->payment_status);
+    }
+
+    /**
+     * Get total items count
+     */
+    public function getTotalItemsAttribute(): int
+    {
+        return $this->orderItems->sum('quantity');
     }
 
     /**
@@ -128,25 +176,10 @@ class Order extends Model
     }
 
     /**
-     * Get order status badge class
+     * Check if payment is completed
      */
-    public function getStatusBadgeClassAttribute(): string
+    public function isPaymentCompleted(): bool
     {
-        return match($this->status) {
-            'pending' => 'bg-warning',
-            'processing' => 'bg-info',
-            'completed' => 'bg-success',
-            'cancelled' => 'bg-danger',
-            'refunded' => 'bg-secondary',
-            default => 'bg-secondary',
-        };
-    }
-
-    /**
-     * Get formatted status
-     */
-    public function getFormattedStatusAttribute(): string
-    {
-        return ucfirst($this->status);
+        return $this->payment_status === 'completed';
     }
 } 

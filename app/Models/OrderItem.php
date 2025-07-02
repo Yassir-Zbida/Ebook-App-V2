@@ -37,7 +37,7 @@ class OrderItem extends Model
     }
 
     /**
-     * Get the ebook for this order item
+     * Get the ebook that owns the order item
      */
     public function ebook(): BelongsTo
     {
@@ -45,11 +45,34 @@ class OrderItem extends Model
     }
 
     /**
-     * Calculate subtotal for this item
+     * Get total price including discount
      */
-    public function calculateSubtotal(): void
+    public function getTotalPriceAttribute(): float
     {
-        $this->subtotal = ($this->price * $this->quantity) - $this->discount_amount;
-        $this->save();
+        return $this->price * $this->quantity - $this->discount_amount;
+    }
+
+    /**
+     * Get formatted price
+     */
+    public function getFormattedPriceAttribute(): string
+    {
+        return number_format($this->price, 2) . ' €';
+    }
+
+    /**
+     * Get formatted subtotal
+     */
+    public function getFormattedSubtotalAttribute(): string
+    {
+        return number_format($this->subtotal, 2) . ' €';
+    }
+
+    /**
+     * Get formatted discount amount
+     */
+    public function getFormattedDiscountAmountAttribute(): string
+    {
+        return number_format($this->discount_amount, 2) . ' €';
     }
 } 

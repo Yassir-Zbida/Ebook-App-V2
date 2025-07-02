@@ -40,6 +40,28 @@ Route::middleware(['role'])->group(function () {
 Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->group(function () {
     // Ebook management
     Route::resource('ebooks', \App\Http\Controllers\Admin\EbookController::class);
+    
+    // Order management
+    Route::get('orders', [\App\Http\Controllers\Admin\OrderController::class, 'index'])->name('orders.index');
+    Route::get('orders/{order}', [\App\Http\Controllers\Admin\OrderController::class, 'show'])->name('orders.show');
+    Route::patch('orders/{order}/status', [\App\Http\Controllers\Admin\OrderController::class, 'updateStatus'])->name('orders.update-status');
+    Route::get('orders/{order}/details', [\App\Http\Controllers\Admin\OrderController::class, 'getOrderDetails'])->name('orders.details');
+    Route::get('orders/stats', [\App\Http\Controllers\Admin\OrderController::class, 'getStats'])->name('orders.stats');
+    
+    // Customer management
+    Route::get('customers', [\App\Http\Controllers\Admin\CustomerController::class, 'index'])->name('customers.index');
+    Route::get('customers/{customer}', [\App\Http\Controllers\Admin\CustomerController::class, 'show'])->name('customers.show');
+    Route::patch('customers/{customer}/status', [\App\Http\Controllers\Admin\CustomerController::class, 'updateStatus'])->name('customers.update-status');
+    Route::get('customers/{customer}/details', [\App\Http\Controllers\Admin\CustomerController::class, 'getCustomerDetails'])->name('customers.details');
+    Route::get('customers/{customer}/orders', [\App\Http\Controllers\Admin\CustomerController::class, 'getCustomerOrders'])->name('customers.orders');
+    Route::get('customers/stats', [\App\Http\Controllers\Admin\CustomerController::class, 'getStats'])->name('customers.stats');
+    
+    // Coupon management
+    Route::resource('coupons', \App\Http\Controllers\Admin\CouponController::class);
+    Route::patch('coupons/{coupon}/toggle-status', [\App\Http\Controllers\Admin\CouponController::class, 'toggleStatus'])->name('coupons.toggle-status');
+    Route::get('coupons/{coupon}/details', [\App\Http\Controllers\Admin\CouponController::class, 'getCouponDetails'])->name('coupons.details');
+    Route::get('coupons/generate-code', [\App\Http\Controllers\Admin\CouponController::class, 'generateCode'])->name('coupons.generate-code');
+    Route::get('coupons/stats', [\App\Http\Controllers\Admin\CouponController::class, 'getStats'])->name('coupons.stats');
 });
 
 // Debug route to test form submission

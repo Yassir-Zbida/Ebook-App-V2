@@ -125,7 +125,8 @@ class StripeController extends Controller
             return response()->json([
                 'success' => false,
                 'message' => 'Payment confirmation failed',
-                'error' => $result['error'] ?? 'Unknown error'
+                'error' => $result['error'] ?? 'Unknown error',
+                'result' => $result
             ], 400);
         }
 
