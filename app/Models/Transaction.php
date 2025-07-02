@@ -84,7 +84,7 @@ class Transaction extends Model
         }
 
         // Add ebooks to user's library
-        foreach ($this->order->items as $orderItem) {
+        foreach ($this->order->orderItems as $orderItem) {
             \DB::table('user_ebooks')->updateOrInsert(
                 [
                     'user_id' => $this->user_id,
@@ -102,7 +102,7 @@ class Transaction extends Model
         // Clear user's cart if it contains the purchased items
         $cart = \App\Models\Cart::where('session_id', $this->user_id)->first();
         if ($cart) {
-            $purchasedEbookIds = $this->order->items->pluck('ebook_id')->toArray();
+            $purchasedEbookIds = $this->order->orderItems->pluck('ebook_id')->toArray();
             $cart->items()->whereIn('ebook_id', $purchasedEbookIds)->delete();
             
             // If cart is empty, delete it

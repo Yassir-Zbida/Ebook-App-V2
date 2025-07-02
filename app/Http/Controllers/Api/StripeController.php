@@ -171,11 +171,15 @@ class StripeController extends Controller
             ], 404);
         }
 
+        // Get real-time status from Stripe
+        $stripeStatus = $this->stripeService->getPaymentIntentStatus($paymentIntentId);
+
         return response()->json([
             'success' => true,
             'data' => [
                 'payment_intent_id' => $paymentIntentId,
-                'status' => $transaction->status,
+                'stripe_status' => $stripeStatus['status'] ?? 'unknown',
+                'local_status' => $transaction->status,
                 'amount' => $transaction->amount,
                 'currency' => $transaction->currency,
                 'order' => [
@@ -186,6 +190,7 @@ class StripeController extends Controller
                 ],
                 'created_at' => $transaction->created_at,
                 'processed_at' => $transaction->processed_at,
+                'client_secret' => $stripeStatus['client_secret'] ?? null,
             ]
         ]);
     }

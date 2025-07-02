@@ -40,9 +40,9 @@ class OrderController extends Controller
                 'order_number' => $order->order_number,
                 'status' => $order->status,
                 'total_amount' => $order->total_amount,
-                'items_count' => $order->items->count(),
+                'items_count' => $order->orderItems->count(),
                 'created_at' => $order->created_at,
-                'items' => $order->items->map(function ($item) {
+                'items' => $order->orderItems->map(function ($item) {
                     return [
                         'id' => $item->id,
                         'ebook_id' => $item->ebook_id,
@@ -69,7 +69,7 @@ class OrderController extends Controller
 
         $order = Order::where('id', $orderId)
             ->where('user_id', $user->id)
-            ->with(['items.ebook'])
+            ->with(['orderItems.ebook'])
             ->first();
 
         if (!$order) {
@@ -93,7 +93,7 @@ class OrderController extends Controller
                 'payment_status' => $order->payment_status,
                 'created_at' => $order->created_at,
                 'completed_at' => $order->completed_at,
-                'items' => $order->items->map(function ($item) {
+                'items' => $order->orderItems->map(function ($item) {
                     return [
                         'id' => $item->id,
                         'ebook_id' => $item->ebook_id,
@@ -266,7 +266,7 @@ class OrderController extends Controller
                         'order_id' => $order->id,
                         'order_number' => $order->order_number,
                         'total_amount' => $order->total_amount,
-                        'items_count' => $order->items->count(),
+                        'items_count' => $order->orderItems->count(),
                         'status' => $order->status,
                         'payment_method' => $order->payment_method,
                         'payment_status' => $order->payment_status,
@@ -308,7 +308,7 @@ class OrderController extends Controller
                         'order_id' => $order->id,
                         'order_number' => $order->order_number,
                         'total_amount' => $order->total_amount,
-                        'items_count' => $order->items->count(),
+                        'items_count' => $order->orderItems->count(),
                         'status' => $order->status,
                         'payment_status' => $order->payment_status,
                         'created_at' => $order->created_at,

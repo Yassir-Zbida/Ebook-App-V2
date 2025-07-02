@@ -92,11 +92,21 @@ class StripeService
         try {
             $paymentIntent = PaymentIntent::retrieve($paymentIntentId);
             
-            if ($paymentIntent->status === 'succeeded') {
-                // Find the transaction and update it
-                $transaction = Transaction::where('gateway_transaction_id', $paymentIntentId)->first();
-                
-                if ($transaction) {
+            // Find the transaction
+            $transaction = Transaction::where('gateway_transaction_id', $paymentIntentId)->first();
+            
+            if (!$transaction) {
+                return [
+                    'success' => false,
+                    'error' => 'Transaction not found',
+                    'payment_intent' => $paymentIntent,
+                ];
+            }
+
+            // Check payment intent status
+            switch ($paymentIntent->status) {
+                case 'succeeded':
+                    // Payment is successful, complete the order
                     $transaction->update([
                         'status' => 'completed',
                         'processed_at' => now(),
@@ -126,14 +136,57 @@ class StripeService
                         'transaction' => $transaction,
                         'order' => $order,
                     ];
-                }
-            }
 
-            return [
-                'success' => false,
-                'error' => 'Payment not completed or transaction not found',
-                'payment_intent' => $paymentIntent,
-            ];
+                case 'requires_payment_method':
+                    return [
+                        'success' => false,
+                        'error' => 'Payment method required. Please complete the payment on the frontend.',
+                        'payment_intent' => $paymentIntent,
+                        'status' => 'requires_payment_method',
+                        'client_secret' => $paymentIntent->client_secret,
+                    ];
+
+                case 'requires_confirmation':
+                    return [
+                        'success' => false,
+                        'error' => 'Payment requires confirmation.',
+                        'payment_intent' => $paymentIntent,
+                        'status' => 'requires_confirmation',
+                    ];
+
+                case 'requires_action':
+                    return [
+                        'success' => false,
+                        'error' => 'Payment requires additional action (3D Secure, etc.).',
+                        'payment_intent' => $paymentIntent,
+                        'status' => 'requires_action',
+                        'client_secret' => $paymentIntent->client_secret,
+                    ];
+
+                case 'processing':
+                    return [
+                        'success' => false,
+                        'error' => 'Payment is being processed.',
+                        'payment_intent' => $paymentIntent,
+                        'status' => 'processing',
+                    ];
+
+                case 'canceled':
+                    return [
+                        'success' => false,
+                        'error' => 'Payment was canceled.',
+                        'payment_intent' => $paymentIntent,
+                        'status' => 'canceled',
+                    ];
+
+                default:
+                    return [
+                        'success' => false,
+                        'error' => 'Payment status not handled: ' . $paymentIntent->status,
+                        'payment_intent' => $paymentIntent,
+                        'status' => $paymentIntent->status,
+                    ];
+            }
 
         } catch (ApiErrorException $e) {
             Log::error('Stripe Payment Confirmation Failed', [
@@ -304,6 +357,41 @@ class StripeService
     private function convertToStripeAmount(float $amount): int
     {
         return (int) round($amount * 100);
+    }
+
+    /**
+     * Get payment intent status without confirming
+     */
+    public function getPaymentIntentStatus(string $paymentIntentId): array
+    {
+        try {
+            $paymentIntent = PaymentIntent::retrieve($paymentIntentId);
+            
+            $transaction = Transaction::where('gateway_transaction_id', $paymentIntentId)->first();
+            
+            return [
+                'success' => true,
+                'payment_intent' => $paymentIntent,
+                'transaction' => $transaction,
+                'status' => $paymentIntent->status,
+                'amount' => $this->convertFromStripeAmount($paymentIntent->amount),
+                'currency' => $paymentIntent->currency,
+                'client_secret' => $paymentIntent->client_secret,
+            ];
+
+        } catch (ApiErrorException $e) {
+            Log::error('Stripe Payment Intent Status Check Failed', [
+                'payment_intent_id' => $paymentIntentId,
+                'error' => $e->getMessage(),
+                'code' => $e->getStripeCode(),
+            ]);
+
+            return [
+                'success' => false,
+                'error' => $e->getMessage(),
+                'code' => $e->getStripeCode(),
+            ];
+        }
     }
 
     /**
