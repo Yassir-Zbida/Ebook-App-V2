@@ -30,7 +30,7 @@ class OrderController extends Controller
         $user = $request->user();
 
         $orders = Order::where('user_id', $user->id)
-            ->with(['items.ebook'])
+            ->with(['orderItems.ebook'])
             ->orderBy('created_at', 'desc')
             ->paginate(12);
 
