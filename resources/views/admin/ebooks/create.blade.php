@@ -4,77 +4,155 @@
 @section('page-title', 'Create New Ebook')
 
 @section('content')
-<div class="space-y-6">
+<div class="space-y-8">
+    <!-- Page Header -->
+    <div class="bg-gradient-to-r from-primary to-primary-light p-6 rounded-2xl shadow-xl relative overflow-hidden">
+        <div class="absolute top-0 right-0 w-64 h-64 bg-white/10 rounded-full -translate-y-32 translate-x-32"></div>
+        <div class="absolute bottom-0 left-0 w-48 h-48 bg-white/5 rounded-full translate-y-24 -translate-x-24"></div>
+        
+        <div class="relative z-10">
+            <div class="flex items-center space-x-4 mb-4">
+                <div class="w-12 h-12 bg-white/20 rounded-xl flex items-center justify-center backdrop-blur-sm">
+                    <i class="ri-book-add-line text-2xl text-white"></i>
+                </div>
+                <div>
+                    <h1 class="text-2xl lg:text-3xl font-bold text-white mb-1">Create New Ebook</h1>
+                    <p class="text-purple-100">Add a new ebook to your catalog with categories and resources</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <form action="{{ route('admin.ebooks.store') }}" method="POST" enctype="multipart/form-data" id="ebookForm">
         @csrf
         
         <!-- Basic Ebook Information -->
-        <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-6">
-            <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">Basic Information</h3>
+        <div class="bg-white dark:bg-gray-dark border border-gray-200 dark:border-gray-soft rounded-2xl shadow-sm p-8 card-shadow">
+            <div class="flex items-center space-x-3 mb-6">
+                <div class="w-10 h-10 bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl flex items-center justify-center shadow-lg">
+                    <i class="ri-information-line text-white text-lg"></i>
+                </div>
+                <div>
+                    <h3 class="text-xl font-bold text-gray-900 dark:text-white">Basic Information</h3>
+                    <p class="text-gray-600 dark:text-gray-light text-sm">Essential details about your ebook</p>
+                </div>
+            </div>
             
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <!-- Title -->
-                <div>
-                    <label for="title" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Title</label>
-                    <input type="text" name="title" id="title" value="{{ old('title') }}" 
-                           class="form-input @error('title') border-red-500 @enderror" required>
+                <div class="space-y-2">
+                    <label for="title" class="block text-sm font-semibold text-gray-700 dark:text-gray-300">Title</label>
+                    <div class="relative">
+                        <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                            <i class="ri-book-line text-gray-400"></i>
+                        </div>
+                        <input type="text" name="title" id="title" value="{{ old('title') }}" 
+                               class="form-input pl-10 @error('title') border-red-500 @enderror" 
+                               placeholder="Enter ebook title" required>
+                    </div>
                     @error('title')
-                        <p class="mt-1 text-sm text-red-500">{{ $message }}</p>
+                        <p class="text-sm text-red-500 flex items-center space-x-1">
+                            <i class="ri-error-warning-line"></i>
+                            <span>{{ $message }}</span>
+                        </p>
                     @enderror
                 </div>
 
                 <!-- Price -->
-                <div>
-                    <label for="price" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Price</label>
-                    <input type="number" name="price" id="price" value="{{ old('price') }}" step="0.01" min="0"
-                           class="form-input @error('price') border-red-500 @enderror" required>
+                <div class="space-y-2">
+                    <label for="price" class="block text-sm font-semibold text-gray-700 dark:text-gray-300">Price</label>
+                    <div class="relative">
+                        <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                            <i class="ri-money-dollar-circle-line text-gray-400"></i>
+                        </div>
+                        <input type="number" name="price" id="price" value="{{ old('price') }}" step="0.01" min="0"
+                               class="form-input pl-10 @error('price') border-red-500 @enderror" 
+                               placeholder="0.00" required>
+                    </div>
                     @error('price')
-                        <p class="mt-1 text-sm text-red-500">{{ $message }}</p>
+                        <p class="text-sm text-red-500 flex items-center space-x-1">
+                            <i class="ri-error-warning-line"></i>
+                            <span>{{ $message }}</span>
+                        </p>
                     @enderror
                 </div>
 
                 <!-- Cover Image -->
-                <div class="md:col-span-2">
-                    <label for="cover_image" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Cover Image</label>
-                    <input type="file" name="cover_image" id="cover_image" accept="image/*"
-                           class="form-input @error('cover_image') border-red-500 @enderror">
+                <div class="md:col-span-2 space-y-2">
+                    <label for="cover_image" class="block text-sm font-semibold text-gray-700 dark:text-gray-300">Cover Image</label>
+                    <div class="mt-1 flex justify-center px-6 pt-5 pb-6 border-2 border-gray-300 dark:border-gray-600 border-dashed rounded-xl hover:border-primary dark:hover:border-primary transition-colors bg-gray-50 dark:bg-gray-800">
+                        <div class="space-y-2 text-center">
+                            <div class="w-16 h-16 bg-gradient-to-br from-primary to-primary-light rounded-xl flex items-center justify-center mx-auto">
+                                <i class="ri-image-line text-white text-2xl"></i>
+                            </div>
+                            <div class="flex text-sm text-gray-600 dark:text-gray-400">
+                                <label class="relative cursor-pointer bg-white dark:bg-gray-700 rounded-lg font-medium text-primary hover:text-primary-dark focus-within:outline-none focus-within:ring-2 focus-within:ring-offset-2 focus-within:ring-primary px-4 py-2 transition-colors">
+                                    <span>Upload image</span>
+                                    <input type="file" name="cover_image" id="cover_image" accept="image/*"
+                                           class="sr-only @error('cover_image') border-red-500 @enderror">
+                                </label>
+                            </div>
+                            <p class="text-xs text-gray-500 dark:text-gray-400">PNG, JPG, GIF up to 2MB</p>
+                        </div>
+                    </div>
                     @error('cover_image')
-                        <p class="mt-1 text-sm text-red-500">{{ $message }}</p>
+                        <p class="text-sm text-red-500 flex items-center space-x-1">
+                            <i class="ri-error-warning-line"></i>
+                            <span>{{ $message }}</span>
+                        </p>
                     @enderror
                 </div>
 
                 <!-- Description -->
-                <div class="md:col-span-2">
-                    <label for="description" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Description</label>
-                    <textarea name="description" id="description" rows="4" 
-                              class="form-input @error('description') border-red-500 @enderror" required>{{ old('description') }}</textarea>
+                <div class="md:col-span-2 space-y-2">
+                    <label for="description" class="block text-sm font-semibold text-gray-700 dark:text-gray-300">Description</label>
+                    <div class="relative">
+                        <div class="absolute top-3 left-3 flex items-start pointer-events-none">
+                            <i class="ri-file-text-line text-gray-400 mt-0.5"></i>
+                        </div>
+                        <textarea name="description" id="description" rows="4" 
+                                  class="form-input pl-10 @error('description') border-red-500 @enderror" 
+                                  placeholder="Describe your ebook content..." required>{{ old('description') }}</textarea>
+                    </div>
                     @error('description')
-                        <p class="mt-1 text-sm text-red-500">{{ $message }}</p>
+                        <p class="text-sm text-red-500 flex items-center space-x-1">
+                            <i class="ri-error-warning-line"></i>
+                            <span>{{ $message }}</span>
+                        </p>
                     @enderror
                 </div>
             </div>
         </div>
 
         <!-- Categories Section -->
-        <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-6">
-            <div class="flex justify-between items-center mb-4">
-                <h3 class="text-lg font-semibold text-gray-900 dark:text-white">Categories Structure</h3>
+        <div class="bg-white dark:bg-gray-dark border border-gray-200 dark:border-gray-soft rounded-2xl shadow-sm p-8 card-shadow">
+            <div class="flex items-center justify-between mb-6">
+                <div class="flex items-center space-x-3">
+                    <div class="w-10 h-10 bg-gradient-to-br from-green-500 to-green-600 rounded-xl flex items-center justify-center shadow-lg">
+                        <i class="ri-folder-line text-white text-lg"></i>
+                    </div>
+                    <div>
+                        <h3 class="text-xl font-bold text-gray-900 dark:text-white">Categories Structure</h3>
+                        <p class="text-gray-600 dark:text-gray-light text-sm">Organize your ebook content with categories</p>
+                    </div>
+                </div>
                 <button type="button" onclick="addRootCategory(); hideNoCategoriesMessage();" 
-                        class="px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary-dark transition-colors">
-                    Add Root Category
+                        class="px-6 py-3 bg-gradient-to-r from-primary to-primary-light text-white rounded-xl hover:from-primary-dark hover:to-primary-dark transition-all duration-200 flex items-center space-x-2 shadow-lg hover:shadow-xl transform hover:scale-105">
+                    <i class="ri-add-line"></i>
+                    <span>Add Root Category</span>
                 </button>
             </div>
 
             <div id="categoriesContainer" class="space-y-4">
                 <!-- Categories will be added here dynamically -->
-                <div id="noCategoriesMessage" class="text-center py-8 border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-lg">
-                    <div class="w-16 h-16 bg-gray-100 dark:bg-gray-700 rounded-full flex items-center justify-center mx-auto mb-4">
-                        <i class="ri-folder-add-line text-2xl text-gray-400"></i>
+                <div id="noCategoriesMessage" class="text-center py-12 border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-2xl bg-gray-50 dark:bg-gray-800">
+                    <div class="w-20 h-20 bg-gradient-to-br from-gray-200 to-gray-300 dark:from-gray-700 dark:to-gray-600 rounded-2xl flex items-center justify-center mx-auto mb-6">
+                        <i class="ri-folder-add-line text-3xl text-gray-400 dark:text-gray-500"></i>
                     </div>
-                    <h3 class="text-lg font-medium text-gray-900 dark:text-white mb-2">No categories added yet</h3>
-                    <p class="text-gray-600 dark:text-gray-400 mb-4">Start by adding a root category to organize your ebook content.</p>
+                    <h3 class="text-xl font-semibold text-gray-900 dark:text-white mb-3">No categories added yet</h3>
+                    <p class="text-gray-600 dark:text-gray-400 mb-6 max-w-md mx-auto">Start by adding a root category to organize your ebook content and create a structured learning experience.</p>
                     <button type="button" onclick="addRootCategory(); hideNoCategoriesMessage();" 
-                            class="px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary-dark transition-colors inline-flex items-center space-x-2">
+                            class="px-6 py-3 bg-gradient-to-r from-primary to-primary-light text-white rounded-xl hover:from-primary-dark hover:to-primary-dark transition-all duration-200 flex items-center space-x-2 mx-auto shadow-lg hover:shadow-xl transform hover:scale-105">
                         <i class="ri-add-line"></i>
                         <span>Add First Category</span>
                     </button>
@@ -82,13 +160,16 @@
             </div>
 
             @error('categories')
-                <p class="mt-2 text-sm text-red-500">{{ $message }}</p>
+                <p class="mt-4 text-sm text-red-500 flex items-center space-x-1">
+                    <i class="ri-error-warning-line"></i>
+                    <span>{{ $message }}</span>
+                </p>
             @enderror
         </div>
 
         <!-- Submit Button -->
         <div class="flex justify-end">
-            <button type="submit" id="submitBtn" class="px-6 py-3 bg-primary text-white rounded-lg hover:bg-primary-dark transition-colors flex items-center space-x-2">
+            <button type="submit" id="submitBtn" class="px-8 py-4 bg-gradient-to-r from-primary to-primary-light text-white rounded-xl hover:from-primary-dark hover:to-primary-dark transition-all duration-200 flex items-center space-x-3 shadow-lg hover:shadow-xl transform hover:scale-105">
                 <span id="submitText">Create Ebook</span>
                 <div id="submitSpinner" class="hidden">
                     <svg class="animate-spin h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
@@ -106,63 +187,63 @@
 
 <!-- Category Template -->
 <template id="categoryTemplate">
-    <div class="category-item border border-gray-200 dark:border-gray-700 rounded-lg p-4 mb-2 relative" data-level="0">
-        <div class="flex justify-between items-center mb-2">
-            <div class="flex items-center space-x-2">
-                <button type="button" class="collapse-btn focus:outline-none transition-transform" onclick="toggleCollapse(this)">
-                    <i class="ri-arrow-down-s-line text-xl transition-transform"></i>
+    <div class="category-item bg-white dark:bg-gray-dark border border-gray-200 dark:border-gray-soft rounded-2xl p-6 mb-4 relative shadow-sm hover:shadow-md transition-all duration-200" data-level="0">
+        <div class="flex justify-between items-center mb-4">
+            <div class="flex items-center space-x-3">
+                <button type="button" class="collapse-btn focus:outline-none transition-transform p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg" onclick="toggleCollapse(this)">
+                    <i class="ri-arrow-down-s-line text-xl transition-transform text-gray-600 dark:text-gray-400"></i>
                 </button>
                 <div class="category-icon-container">
-                    <div class="w-7 h-7 bg-gradient-to-br from-primary to-primary-light rounded-lg flex items-center justify-center text-white category-icon-display">
+                    <div class="w-10 h-10 bg-gradient-to-br from-primary to-primary-light rounded-xl flex items-center justify-center text-white category-icon-display shadow-lg">
                         <i class="ri-folder-line"></i>
                     </div>
-                    <div class="w-7 h-7 rounded-lg overflow-hidden border border-gray-300 hidden category-image-preview">
+                    <div class="w-10 h-10 rounded-xl overflow-hidden border border-gray-300 dark:border-gray-600 hidden category-image-preview shadow-lg">
                         <img src="" alt="" class="w-full h-full object-cover">
                     </div>
                 </div>
-                <span class="font-medium text-gray-900 dark:text-white category-summary">Category</span>
+                <span class="font-semibold text-gray-900 dark:text-white category-summary text-lg">Category</span>
             </div>
-            <div class="flex items-center space-x-2">
+            <div class="flex items-center space-x-3">
                 <button type="button" onclick="addSubcategory(this)" 
-                        class="px-3 py-1 bg-primary/10 text-primary rounded-lg hover:bg-primary/20 transition-colors flex items-center space-x-2">
+                        class="px-4 py-2 bg-gradient-to-r from-green-500 to-green-600 text-white rounded-lg hover:from-green-600 hover:to-green-700 transition-all duration-200 flex items-center space-x-2 shadow-md hover:shadow-lg">
                     <i class="ri-add-line"></i>
                     <span>Add Subcategory</span>
                 </button>
                 <button type="button" onclick="removeCategory(this)" 
-                        class="p-2 text-red-500 hover:text-red-700">
-                    <i class="ri-delete-bin-line"></i>
+                        class="p-3 text-red-500 hover:text-red-700 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-all duration-200">
+                    <i class="ri-delete-bin-line text-lg"></i>
                 </button>
             </div>
         </div>
-        <div class="category-details grid grid-cols-1 md:grid-cols-2 gap-4 mb-2">
-            <div>
-                <label class="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">Name</label>
-                <input type="text" name="categories[INDEX][name]" class="form-input form-input-sm category-name-input" required oninput="updateCategorySummary(this)">
+        <div class="category-details grid grid-cols-1 md:grid-cols-2 gap-6 mb-4">
+            <div class="space-y-2">
+                <label class="block text-sm font-semibold text-gray-700 dark:text-gray-300">Name</label>
+                <input type="text" name="categories[INDEX][name]" class="form-input category-name-input" placeholder="Category name" required oninput="updateCategorySummary(this)">
             </div>
-            <div>
-                <label class="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">Icon (optional)</label>
-                <input type="text" name="categories[INDEX][icon]" class="form-input form-input-sm category-icon-input" placeholder="ri-folder-line">
+            <div class="space-y-2">
+                <label class="block text-sm font-semibold text-gray-700 dark:text-gray-300">Icon (optional)</label>
+                <input type="text" name="categories[INDEX][icon]" class="form-input category-icon-input" placeholder="ri-folder-line">
             </div>
-            <div class="md:col-span-2">
-                <label class="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">Description (optional)</label>
-                <textarea name="categories[INDEX][description]" class="form-input form-input-sm category-description-input" rows="2"></textarea>
+            <div class="md:col-span-2 space-y-2">
+                <label class="block text-sm font-semibold text-gray-700 dark:text-gray-300">Description (optional)</label>
+                <textarea name="categories[INDEX][description]" class="form-input category-description-input" rows="3" placeholder="Brief description of this category"></textarea>
             </div>
-            <div class="md:col-span-2">
-                <label class="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">Category Image (optional)</label>
-                <div class="mt-1 flex justify-center px-6 pt-5 pb-6 border-2 border-gray-300 border-dashed rounded-md hover:border-gray-400 transition-colors category-image-upload">
-                    <div class="space-y-1 text-center">
-                        <svg class="mx-auto h-8 w-8 text-gray-400" stroke="currentColor" fill="none" viewBox="0 0 48 48">
-                            <path d="M28 8H12a4 4 0 00-4 4v20m32-12v8m0 0v8a4 4 0 01-4 4H12a4 4 0 01-4-4v-4m32-4l-3.172-3.172a4 4 0 00-5.656 0L28 28M8 32l9.172-9.172a4 4 0 015.656 0L28 28m0 0l4 4m4-24h8m-4-4v8m-12 4h.02" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
-                        </svg>
-                        <div class="flex text-xs text-gray-600">
-                            <label class="relative cursor-pointer bg-white rounded-md font-medium text-primary hover:text-primary-dark focus-within:outline-none focus-within:ring-2 focus-within:ring-offset-2 focus-within:ring-primary">
+            <div class="md:col-span-2 space-y-2">
+                <label class="block text-sm font-semibold text-gray-700 dark:text-gray-300">Category Image (optional)</label>
+                <div class="mt-1 flex justify-center px-6 pt-5 pb-6 border-2 border-gray-300 dark:border-gray-600 border-dashed rounded-xl hover:border-primary dark:hover:border-primary transition-colors bg-gray-50 dark:bg-gray-800 category-image-upload">
+                    <div class="space-y-2 text-center">
+                        <div class="w-12 h-12 bg-gradient-to-br from-primary to-primary-light rounded-xl flex items-center justify-center mx-auto">
+                            <i class="ri-image-line text-white text-xl"></i>
+                        </div>
+                        <div class="flex text-sm text-gray-600 dark:text-gray-400">
+                            <label class="relative cursor-pointer bg-white dark:bg-gray-700 rounded-lg font-medium text-primary hover:text-primary-dark focus-within:outline-none focus-within:ring-2 focus-within:ring-offset-2 focus-within:ring-primary px-4 py-2 transition-colors">
                                 <span>Upload image</span>
                                 <input type="file" name="categories[INDEX][image]" 
                                        class="sr-only category-image-input" accept="image/*" onchange="updateCategoryImageName(this)">
                             </label>
                         </div>
-                        <p class="text-xs text-gray-500">PNG, JPG, GIF up to 2MB</p>
-                        <p class="text-xs text-green-600 hidden category-image-name"></p>
+                        <p class="text-xs text-gray-500 dark:text-gray-400">PNG, JPG, GIF up to 2MB</p>
+                        <p class="text-xs text-green-600 dark:text-green-400 hidden category-image-name"></p>
                     </div>
                 </div>
             </div>
@@ -172,18 +253,23 @@
         </div>
         <div class="collapsible-children transition-all duration-300 ease-in-out overflow-hidden">
             <!-- Subcategories Container -->
-            <div class="subcategories-container space-y-2 ml-6 border-l-2 border-gray-200 dark:border-gray-700 pl-3">
+            <div class="subcategories-container space-y-4 ml-8 border-l-2 border-gray-200 dark:border-gray-700 pl-6">
                 <!-- Subcategories will be added here dynamically -->
             </div>
             <!-- Resource Container (only for leaf nodes) -->
-            <div class="resource-container mt-3">
-                <div class="flex justify-between items-center mb-2">
-                    <div class="flex items-center space-x-2">
-                        <h5 class="text-xs font-medium text-gray-700 dark:text-gray-300">Resource</h5>
-                        <span class="text-xs text-gray-500 dark:text-gray-400">(Only available for leaf nodes)</span>
+            <div class="resource-container mt-6">
+                <div class="flex justify-between items-center mb-4">
+                    <div class="flex items-center space-x-3">
+                        <div class="w-8 h-8 bg-gradient-to-br from-orange-500 to-orange-600 rounded-lg flex items-center justify-center">
+                            <i class="ri-file-line text-white text-sm"></i>
+                        </div>
+                        <div>
+                            <h5 class="text-sm font-semibold text-gray-700 dark:text-gray-300">Resource</h5>
+                            <p class="text-xs text-gray-500 dark:text-gray-400">Only available for leaf nodes</p>
+                        </div>
                     </div>
                     <button type="button" onclick="toggleResource(this)" 
-                            class="px-2 py-1 bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors text-xs flex items-center space-x-1">
+                            class="px-4 py-2 bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-600 transition-all duration-200 text-sm flex items-center space-x-2">
                         <i class="ri-add-line"></i>
                         <span>Add Resource</span>
                     </button>
@@ -198,26 +284,26 @@
 
 <!-- Resource Template -->
 <template id="resourceTemplate">
-    <div class="resource-item border border-gray-200 dark:border-gray-700 rounded-lg p-4">
-        <div class="flex justify-between items-start mb-4">
+    <div class="resource-item bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-6">
+        <div class="flex justify-between items-start mb-6">
             <div class="flex items-center space-x-3">
-                <div class="w-8 h-8 bg-gradient-to-br from-green-500 to-green-600 rounded-lg flex items-center justify-center text-white">
+                <div class="w-10 h-10 bg-gradient-to-br from-green-500 to-green-600 rounded-xl flex items-center justify-center text-white shadow-lg">
                     <i class="ri-file-line"></i>
                 </div>
-                <h6 class="text-md font-medium text-gray-900 dark:text-white">Resource</h6>
+                <h6 class="text-lg font-semibold text-gray-900 dark:text-white">Resource</h6>
             </div>
-            <button type="button" onclick="removeResource(this)" class="p-2 text-red-500 hover:text-red-700">
-                <i class="ri-delete-bin-line"></i>
+            <button type="button" onclick="removeResource(this)" class="p-2 text-red-500 hover:text-red-700 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-all duration-200">
+                <i class="ri-delete-bin-line text-lg"></i>
             </button>
         </div>
 
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-            <div>
-                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Title</label>
-                <input type="text" name="categories[CATEGORY_INDEX][resource][title]" class="form-input resource-title-input">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+            <div class="space-y-2">
+                <label class="block text-sm font-semibold text-gray-700 dark:text-gray-300">Title</label>
+                <input type="text" name="categories[CATEGORY_INDEX][resource][title]" class="form-input resource-title-input" placeholder="Resource title">
             </div>
-            <div>
-                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Content Type</label>
+            <div class="space-y-2">
+                <label class="block text-sm font-semibold text-gray-700 dark:text-gray-300">Content Type</label>
                 <select name="categories[CATEGORY_INDEX][resource][content_type]" 
                         class="form-input resource-content-type-input" onchange="handleContentTypeChange(this)">
                     <option value="">Select file type</option>
@@ -225,33 +311,33 @@
                     <option value="excel">Excel File (.xlsx, .xls)</option>
                 </select>
             </div>
-            <div class="md:col-span-2">
-                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Description (optional)</label>
-                <textarea name="categories[CATEGORY_INDEX][resource][description]" class="form-input" rows="2" placeholder="Brief description of the resource content"></textarea>
+            <div class="md:col-span-2 space-y-2">
+                <label class="block text-sm font-semibold text-gray-700 dark:text-gray-300">Description (optional)</label>
+                <textarea name="categories[CATEGORY_INDEX][resource][description]" class="form-input" rows="3" placeholder="Brief description of the resource content"></textarea>
             </div>
         </div>
 
         <!-- File Upload Section -->
         <div class="content-container">
             <div class="file-upload-container">
-                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                <label class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-3">
                     Upload File <span class="text-red-500">*</span>
                 </label>
-                <div class="mt-1 flex justify-center px-6 pt-5 pb-6 border-2 border-gray-300 border-dashed rounded-md hover:border-gray-400 transition-colors">
-                    <div class="space-y-1 text-center">
-                        <svg class="mx-auto h-12 w-12 text-gray-400" stroke="currentColor" fill="none" viewBox="0 0 48 48">
-                            <path d="M28 8H12a4 4 0 00-4 4v20m32-12v8m0 0v8a4 4 0 01-4 4H12a4 4 0 01-4-4v-4m32-4l-3.172-3.172a4 4 0 00-5.656 0L28 28M8 32l9.172-9.172a4 4 0 015.656 0L28 28m0 0l4 4m4-24h8m-4-4v8m-12 4h.02" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
-                        </svg>
-                        <div class="flex text-sm text-gray-600">
-                            <label class="relative cursor-pointer bg-white rounded-md font-medium text-primary hover:text-primary-dark focus-within:outline-none focus-within:ring-2 focus-within:ring-offset-2 focus-within:ring-primary">
+                <div class="mt-1 flex justify-center px-6 pt-5 pb-6 border-2 border-gray-300 dark:border-gray-600 border-dashed rounded-xl hover:border-primary dark:hover:border-primary transition-colors bg-gray-50 dark:bg-gray-800">
+                    <div class="space-y-2 text-center">
+                        <div class="w-16 h-16 bg-gradient-to-br from-primary to-primary-light rounded-xl flex items-center justify-center mx-auto">
+                            <i class="ri-upload-line text-white text-2xl"></i>
+                        </div>
+                        <div class="flex text-sm text-gray-600 dark:text-gray-400">
+                            <label class="relative cursor-pointer bg-white dark:bg-gray-700 rounded-lg font-medium text-primary hover:text-primary-dark focus-within:outline-none focus-within:ring-2 focus-within:ring-offset-2 focus-within:ring-primary px-4 py-2 transition-colors">
                                 <span>Upload a file</span>
                                 <input type="file" name="categories[CATEGORY_INDEX][resource][file]" 
                                        class="sr-only file-input resource-file-input" accept=".pdf,.xlsx,.xls" onchange="updateFileName(this)">
                             </label>
-                            <p class="pl-1">or drag and drop</p>
+                            <p class="pl-2 self-center">or drag and drop</p>
                         </div>
-                        <p class="text-xs text-gray-500">PDF, Excel files up to 20MB</p>
-                        <p class="text-xs text-green-600 hidden file-name"></p>
+                        <p class="text-xs text-gray-500 dark:text-gray-400">PDF, Excel files up to 20MB</p>
+                        <p class="text-xs text-green-600 dark:text-green-400 hidden file-name"></p>
                     </div>
                 </div>
             </div>
@@ -276,30 +362,53 @@
     opacity: 0;
     pointer-events: none;
 }
-.form-input-sm {
-    padding: 0.25rem 0.5rem;
-    font-size: 0.9rem;
-}
 .category-summary {
-    font-size: 1rem;
-    font-weight: 500;
-    color: #6b7280;
+    font-size: 1.125rem;
+    font-weight: 600;
+    color: #374151;
+}
+.dark .category-summary {
+    color: #f3f4f6;
 }
 .file-upload-container .border-dashed:hover {
-    border-color: #9ca3af;
-    background-color: #f9fafb;
+    border-color: #8622c7;
+    background-color: #f8fafc;
+}
+.dark .file-upload-container .border-dashed:hover {
+    background-color: #1f2937;
 }
 .file-upload-container input[type="file"]:focus + label {
-    outline: 2px solid #3b82f6;
+    outline: 2px solid #8622c7;
     outline-offset: 2px;
 }
 .category-image-upload .border-dashed:hover {
-    border-color: #9ca3af;
-    background-color: #f9fafb;
+    border-color: #8622c7;
+    background-color: #f8fafc;
+}
+.dark .category-image-upload .border-dashed:hover {
+    background-color: #1f2937;
 }
 .category-image-upload input[type="file"]:focus + label {
-    outline: 2px solid #3b82f6;
+    outline: 2px solid #8622c7;
     outline-offset: 2px;
+}
+
+/* Enhanced form inputs */
+.form-input {
+    @apply w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-xl bg-white dark:bg-gray-800 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:ring-2 focus:ring-primary focus:border-transparent transition-all duration-200;
+}
+
+.form-input:focus {
+    @apply shadow-lg;
+}
+
+/* Card shadow utility */
+.card-shadow {
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+}
+
+.dark .card-shadow {
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.3), 0 2px 4px -1px rgba(0, 0, 0, 0.2);
 }
 </style>
 @endpush
@@ -386,7 +495,7 @@ function addRootCategory() {
     console.log('Updated content sample:', updatedContent.substring(0, 200));
     
     const wrapper = document.createElement('div');
-    wrapper.className = 'category-item border border-gray-200 dark:border-gray-700 rounded-lg p-4 mb-2 relative';
+    wrapper.className = 'category-item bg-white dark:bg-gray-dark border border-gray-200 dark:border-gray-soft rounded-2xl p-6 mb-4 relative shadow-sm hover:shadow-md transition-all duration-200';
     wrapper.innerHTML = updatedContent;
     container.appendChild(wrapper);
     
@@ -420,7 +529,7 @@ function addSubcategory(button) {
     const content = clone.querySelector('.category-item').innerHTML;
     const updatedContent = content.replace(/INDEX/g, subcategoryId).replace(/CATEGORY_INDEX/g, subcategoryId);
     const wrapper = document.createElement('div');
-    wrapper.className = 'category-item border border-gray-200 dark:border-gray-700 rounded-lg p-4 mb-2 relative';
+    wrapper.className = 'category-item bg-white dark:bg-gray-dark border border-gray-200 dark:border-gray-soft rounded-2xl p-6 mb-4 relative shadow-sm hover:shadow-md transition-all duration-200';
     wrapper.dataset.level = level;
     wrapper.innerHTML = updatedContent;
     
@@ -572,18 +681,18 @@ function showAlert(message, type = 'success') {
     const alertId = 'alert-' + Date.now();
     
     const alertColors = {
-        success: 'bg-green-500',
-        error: 'bg-red-500',
-        warning: 'bg-yellow-500',
-        info: 'bg-blue-500'
+        success: 'bg-gradient-to-r from-green-500 to-green-600',
+        error: 'bg-gradient-to-r from-red-500 to-red-600',
+        warning: 'bg-gradient-to-r from-yellow-500 to-yellow-600',
+        info: 'bg-gradient-to-r from-blue-500 to-blue-600'
     };
     
     const alertHtml = `
-        <div id="${alertId}" class="${alertColors[type]} text-white px-6 py-3 rounded-lg shadow-lg transform translate-x-full transition-transform duration-300 ease-in-out">
+        <div id="${alertId}" class="${alertColors[type]} text-white px-6 py-4 rounded-xl shadow-xl transform translate-x-full transition-transform duration-300 ease-in-out">
             <div class="flex items-center justify-between">
-                <span>${message}</span>
-                <button onclick="hideAlert('${alertId}')" class="ml-4 text-white hover:text-gray-200">
-                    <i class="ri-close-line"></i>
+                <span class="font-medium">${message}</span>
+                <button onclick="hideAlert('${alertId}')" class="ml-4 text-white hover:text-gray-200 transition-colors">
+                    <i class="ri-close-line text-lg"></i>
                 </button>
             </div>
         </div>
@@ -712,4 +821,4 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 </script>
 @endpush
-@endsection
+@endsection 
