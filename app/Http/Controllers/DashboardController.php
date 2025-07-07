@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use App\Http\Controllers\Admin\DashboardController as AdminDashboardController;
 
 class DashboardController extends Controller
 {
@@ -13,7 +14,9 @@ class DashboardController extends Controller
     public function index(Request $request)
     {
         if ($request->is_admin) {
-            return view('admin.index');
+            // Use the admin dashboard controller to get dynamic data
+            $adminController = new AdminDashboardController();
+            return $adminController->index();
         } else {
             return view('customer.index');
         }

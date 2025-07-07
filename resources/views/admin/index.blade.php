@@ -52,8 +52,8 @@
                 </span>
             </div>
             <h3 class="text-gray-600 dark:text-gray-light text-sm font-medium mb-2">Total des ventes</h3>
-            <p class="text-3xl font-bold text-gray-800 dark:text-white mb-1">5 094</p>
-            <p class="text-sm text-gray-500 dark:text-gray-light">Depuis 732 (7 derniers jours)</p>
+            <p class="text-3xl font-bold text-gray-800 dark:text-white mb-1">{{ number_format($totalSales) }}</p>
+            <p class="text-sm text-gray-500 dark:text-gray-light">Croissance: {{ number_format($salesGrowth, 1) }}%</p>
             <div class="mt-4 w-full bg-gray-200 dark:bg-gray-soft rounded-full h-2">
                 <div class="bg-gradient-to-r from-purple-500 to-purple-600 h-2 rounded-full" style="width: 75%"></div>
             </div>
@@ -70,8 +70,8 @@
                 </span>
             </div>
             <h3 class="text-gray-600 dark:text-gray-light text-sm font-medium mb-2">Revenus</h3>
-            <p class="text-3xl font-bold text-gray-800 dark:text-white mb-1">387 542 €</p>
-            <p class="text-sm text-gray-500 dark:text-gray-light">24 Sep 2024</p>
+            <p class="text-3xl font-bold text-gray-800 dark:text-white mb-1">{{ number_format($totalRevenue, 2) }} €</p>
+            <p class="text-sm text-gray-500 dark:text-gray-light">Croissance: {{ number_format($revenueGrowth, 1) }}%</p>
             <div class="mt-4 w-full bg-gray-200 dark:bg-gray-soft rounded-full h-2">
                 <div class="bg-gradient-to-r from-green-500 to-green-600 h-2 rounded-full" style="width: 85%"></div>
             </div>
@@ -88,8 +88,8 @@
                 </span>
             </div>
             <h3 class="text-gray-600 dark:text-gray-light text-sm font-medium mb-2">Utilisateurs actifs</h3>
-            <p class="text-3xl font-bold text-gray-800 dark:text-white mb-1">2 412</p>
-            <p class="text-sm text-gray-500 dark:text-gray-light">Depuis 732 (7 derniers jours)</p>
+            <p class="text-3xl font-bold text-gray-800 dark:text-white mb-1">{{ number_format($activeUsers) }}</p>
+            <p class="text-sm text-gray-500 dark:text-gray-light">Total clients: {{ number_format($totalUsers) }}</p>
             <div class="mt-4 w-full bg-gray-200 dark:bg-gray-soft rounded-full h-2">
                 <div class="bg-gradient-to-r from-blue-500 to-blue-600 h-2 rounded-full" style="width: 65%"></div>
             </div>
@@ -106,8 +106,8 @@
                 </span>
             </div>
             <h3 class="text-gray-600 dark:text-gray-light text-sm font-medium mb-2">Taux de conversion</h3>
-            <p class="text-3xl font-bold text-gray-800 dark:text-white mb-1">85%</p>
-            <p class="text-sm text-gray-500 dark:text-gray-light">Depuis 732 (7 derniers jours)</p>
+            <p class="text-3xl font-bold text-gray-800 dark:text-white mb-1">{{ number_format($conversionRate, 1) }}%</p>
+            <p class="text-sm text-gray-500 dark:text-gray-light">Croissance: {{ number_format($conversionGrowth, 1) }}%</p>
             <div class="mt-4 w-full bg-gray-200 dark:bg-gray-soft rounded-full h-2">
                 <div class="bg-gradient-to-r from-orange-500 to-orange-600 h-2 rounded-full" style="width: 85%"></div>
             </div>
@@ -185,100 +185,46 @@
                 </div>
 
                 <div class="space-y-4">
+                    @foreach($recentPurchases as $purchase)
                     <div class="flex items-start space-x-4 p-3 rounded-xl hover:bg-gray-50 dark:hover:bg-gray-soft transition-colors group">
                         <div class="relative">
-                            <img src="https://ui-avatars.com/api/?name=David+Elson&background=8622c7&color=fff" alt="David Elson" class="w-12 h-12 rounded-xl shadow-md">
-                            <div class="absolute -bottom-1 -right-1 w-5 h-5 bg-purple-500 rounded-full flex items-center justify-center shadow-lg">
-                                <i class="ri-heart-fill text-white text-xs"></i>
-                            </div>
-                        </div>
-                        <div class="flex-1">
-                            <p class="text-gray-800 dark:text-white font-medium">
-                                <span class="font-semibold">David Elson</span>
-                                <span class="font-normal text-gray-600 dark:text-gray-light">a ajouté votre ebook aux favoris</span>
-                            </p>
-                            <p class="text-sm text-gray-500 dark:text-gray-light mt-1 flex items-center space-x-1">
-                                <i class="ri-time-line text-xs"></i>
-                                <span>Il y a 6 min</span>
-                            </p>
-                        </div>
-                    </div>
-
-                    <div class="flex items-start space-x-4 p-3 rounded-xl hover:bg-gray-50 dark:hover:bg-gray-soft transition-colors group">
-                        <div class="relative">
-                            <img src="https://ui-avatars.com/api/?name=Kurt+Bates&background=ef4444&color=fff" alt="Kurt Bates" class="w-12 h-12 rounded-xl shadow-md">
+                            <img src="https://ui-avatars.com/api/?name={{ urlencode($purchase->user->name) }}&background=8622c7&color=fff" alt="{{ $purchase->user->name }}" class="w-12 h-12 rounded-xl shadow-md">
                             <div class="absolute -bottom-1 -right-1 w-5 h-5 bg-green-500 rounded-full flex items-center justify-center shadow-lg">
                                 <i class="ri-shopping-cart-fill text-white text-xs"></i>
                             </div>
                         </div>
                         <div class="flex-1">
                             <p class="text-gray-800 dark:text-white font-medium">
-                                <span class="font-semibold">Kurt Bates</span>
-                                <span class="font-normal text-gray-600 dark:text-gray-light">a acheté votre produit</span>
+                                <span class="font-semibold">{{ $purchase->user->name }}</span>
+                                <span class="font-normal text-gray-600 dark:text-gray-light">a acheté {{ $purchase->ebook->title }}</span>
                             </p>
                             <p class="text-sm text-gray-500 dark:text-gray-light mt-1 flex items-center space-x-1">
                                 <i class="ri-time-line text-xs"></i>
-                                <span>Il y a 16 min</span>
+                                <span>{{ $purchase->purchased_at->diffForHumans() }}</span>
                             </p>
                         </div>
                     </div>
-
+                    @endforeach
+                    @foreach($recentReviews as $review)
                     <div class="flex items-start space-x-4 p-3 rounded-xl hover:bg-gray-50 dark:hover:bg-gray-soft transition-colors group">
                         <div class="relative">
-                            <img src="https://ui-avatars.com/api/?name=Eddie+Lake&background=3b82f6&color=fff" alt="Eddie Lake" class="w-12 h-12 rounded-xl shadow-md">
-                            <div class="absolute -bottom-1 -right-1 w-5 h-5 bg-purple-500 rounded-full flex items-center justify-center shadow-lg">
-                                <i class="ri-heart-fill text-white text-xs"></i>
-                            </div>
-                        </div>
-                        <div class="flex-1">
-                            <p class="text-gray-800 dark:text-white font-medium">
-                                <span class="font-semibold">Eddie Lake</span>
-                                <span class="font-normal text-gray-600 dark:text-gray-light">a ajouté votre ebook aux favoris</span>
-                            </p>
-                            <p class="text-sm text-gray-500 dark:text-gray-light mt-1 flex items-center space-x-1">
-                                <i class="ri-time-line text-xs"></i>
-                                <span>Il y a 20 min</span>
-                            </p>
-                        </div>
-                    </div>
-
-                    <div class="flex items-start space-x-4 p-3 rounded-xl hover:bg-gray-50 dark:hover:bg-gray-soft transition-colors group">
-                        <div class="relative">
-                            <img src="https://ui-avatars.com/api/?name=Patricia+Sanders&background=10b981&color=fff" alt="Patricia Sanders" class="w-12 h-12 rounded-xl shadow-md">
-                            <div class="absolute -bottom-1 -right-1 w-5 h-5 bg-green-500 rounded-full flex items-center justify-center shadow-lg">
-                                <i class="ri-shopping-cart-fill text-white text-xs"></i>
-                            </div>
-                        </div>
-                        <div class="flex-1">
-                            <p class="text-gray-800 dark:text-white font-medium">
-                                <span class="font-semibold">Patricia Sanders</span>
-                                <span class="font-normal text-gray-600 dark:text-gray-light">a acheté votre produit</span>
-                            </p>
-                            <p class="text-sm text-gray-500 dark:text-gray-light mt-1 flex items-center space-x-1">
-                                <i class="ri-time-line text-xs"></i>
-                                <span>Il y a 32 min</span>
-                            </p>
-                        </div>
-                    </div>
-
-                    <div class="flex items-start space-x-4 p-3 rounded-xl hover:bg-gray-50 dark:hover:bg-gray-soft transition-colors group">
-                        <div class="relative">
-                            <img src="https://ui-avatars.com/api/?name=Marie+Dubois&background=f59e0b&color=fff" alt="Marie Dubois" class="w-12 h-12 rounded-xl shadow-md">
+                            <img src="https://ui-avatars.com/api/?name={{ urlencode($review->user->name) }}&background=f59e0b&color=fff" alt="{{ $review->user->name }}" class="w-12 h-12 rounded-xl shadow-md">
                             <div class="absolute -bottom-1 -right-1 w-5 h-5 bg-blue-500 rounded-full flex items-center justify-center shadow-lg">
                                 <i class="ri-star-fill text-white text-xs"></i>
                             </div>
                         </div>
                         <div class="flex-1">
                             <p class="text-gray-800 dark:text-white font-medium">
-                                <span class="font-semibold">Marie Dubois</span>
-                                <span class="font-normal text-gray-600 dark:text-gray-light">a laissé un avis 5 étoiles</span>
+                                <span class="font-semibold">{{ $review->user->name }}</span>
+                                <span class="font-normal text-gray-600 dark:text-gray-light">a laissé un avis {{ $review->rating }} étoiles sur {{ $review->ebook->title }}</span>
                             </p>
                             <p class="text-sm text-gray-500 dark:text-gray-light mt-1 flex items-center space-x-1">
                                 <i class="ri-time-line text-xs"></i>
-                                <span>Il y a 45 min</span>
+                                <span>{{ $review->created_at->diffForHumans() }}</span>
                             </p>
                         </div>
                     </div>
+                    @endforeach
                 </div>
             </div>
 
@@ -383,175 +329,16 @@
                 <thead>
                     <tr class="text-left border-b border-gray-200 dark:border-gray-soft">
                         <th class="pb-4 text-sm font-semibold text-gray-600 dark:text-gray-light">Titre du livre</th>
-                        <th class="pb-4 text-sm font-semibold text-gray-600 dark:text-gray-light">Auteur</th>
-                        <th class="pb-4 text-sm font-semibold text-gray-600 dark:text-gray-light hidden lg:table-cell">Catégorie</th>
-                        <th class="pb-4 text-sm font-semibold text-gray-600 dark:text-gray-light">Prix</th>
-                        <th class="pb-4 text-sm font-semibold text-gray-600 dark:text-gray-light hidden sm:table-cell">Ventes</th>
-                        <th class="pb-4 text-sm font-semibold text-gray-600 dark:text-gray-light">Revenus</th>
-                        <th class="pb-4 text-sm font-semibold text-gray-600 dark:text-gray-light">Actions</th>
+                        <th class="pb-4 text-sm font-semibold text-gray-600 dark:text-gray-light">Ventes</th>
                     </tr>
                 </thead>
                 <tbody class="divide-y divide-gray-200 dark:divide-gray-soft">
-                    <tr class="hover:bg-gray-50 dark:hover:bg-gray-soft/50 transition-colors group">
-                        <td class="py-5">
-                            <div class="flex items-center space-x-4">
-                                <div class="w-12 h-16 bg-gradient-to-br from-purple-500 to-purple-600 rounded-lg flex items-center justify-center shadow-md group-hover:shadow-lg transition-shadow">
-                                    <i class="ri-book-2-fill text-white text-xl"></i>
-                                </div>
-                                <div>
-                                    <p class="text-gray-800 dark:text-white font-semibold">La Révolution Numérique</p>
-                                    <p class="text-sm text-gray-500 dark:text-gray-light lg:hidden">Technologie</p>
-                                </div>
-                            </div>
-                        </td>
-                        <td class="py-5 text-gray-600 dark:text-gray-light">Jean Dupont</td>
-                        <td class="py-5 text-gray-600 dark:text-gray-light hidden lg:table-cell">
-                            <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800 dark:bg-blue-900/20 dark:text-blue-400">
-                                Technologie
-                            </span>
-                        </td>
-                        <td class="py-5 text-gray-800 dark:text-white font-semibold">24,99 €</td>
-                        <td class="py-5 text-gray-800 dark:text-white hidden sm:table-cell">1 234</td>
-                        <td class="py-5 text-green-600 dark:text-green-400 font-bold">30 837,66 €</td>
-                        <td class="py-5">
-                            <div class="flex items-center space-x-2">
-                                <button class="p-2 hover:bg-gray-100 dark:hover:bg-gray-soft rounded-lg text-gray-600 dark:text-gray-light hover:text-gray-800 dark:hover:text-white transition-colors">
-                                    <i class="ri-eye-line text-lg"></i>
-                                </button>
-                                <button class="p-2 hover:bg-gray-100 dark:hover:bg-gray-soft rounded-lg text-gray-600 dark:text-gray-light hover:text-gray-800 dark:hover:text-white transition-colors">
-                                    <i class="ri-more-2-fill text-lg"></i>
-                                </button>
-                            </div>
-                        </td>
+                    @foreach($topSellingEbooks as $ebook)
+                    <tr>
+                        <td class="py-5 text-gray-800 dark:text-white font-semibold">{{ $ebook->title }}</td>
+                        <td class="py-5 text-gray-800 dark:text-white">{{ $ebook->purchasers_count }}</td>
                     </tr>
-                    <tr class="hover:bg-gray-50 dark:hover:bg-gray-soft/50 transition-colors group">
-                        <td class="py-5">
-                            <div class="flex items-center space-x-4">
-                                <div class="w-12 h-16 bg-gradient-to-br from-blue-500 to-blue-600 rounded-lg flex items-center justify-center shadow-md group-hover:shadow-lg transition-shadow">
-                                    <i class="ri-book-2-fill text-white text-xl"></i>
-                                </div>
-                                <div>
-                                    <p class="text-gray-800 dark:text-white font-semibold">Maîtriser Python</p>
-                                    <p class="text-sm text-gray-500 dark:text-gray-light lg:hidden">Programmation</p>
-                                </div>
-                            </div>
-                        </td>
-                        <td class="py-5 text-gray-600 dark:text-gray-light">Marie Martin</td>
-                        <td class="py-5 text-gray-600 dark:text-gray-light hidden lg:table-cell">
-                            <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800 dark:bg-green-900/20 dark:text-green-400">
-                                Programmation
-                            </span>
-                        </td>
-                        <td class="py-5 text-gray-800 dark:text-white font-semibold">34,99 €</td>
-                        <td class="py-5 text-gray-800 dark:text-white hidden sm:table-cell">892</td>
-                        <td class="py-5 text-green-600 dark:text-green-400 font-bold">31 211,08 €</td>
-                        <td class="py-5">
-                            <div class="flex items-center space-x-2">
-                                <button class="p-2 hover:bg-gray-100 dark:hover:bg-gray-soft rounded-lg text-gray-600 dark:text-gray-light hover:text-gray-800 dark:hover:text-white transition-colors">
-                                    <i class="ri-eye-line text-lg"></i>
-                                </button>
-                                <button class="p-2 hover:bg-gray-100 dark:hover:bg-gray-soft rounded-lg text-gray-600 dark:text-gray-light hover:text-gray-800 dark:hover:text-white transition-colors">
-                                    <i class="ri-more-2-fill text-lg"></i>
-                                </button>
-                            </div>
-                        </td>
-                    </tr>
-                    <tr class="hover:bg-gray-50 dark:hover:bg-gray-soft/50 transition-colors group">
-                        <td class="py-5">
-                            <div class="flex items-center space-x-4">
-                                <div class="w-12 h-16 bg-gradient-to-br from-green-500 to-green-600 rounded-lg flex items-center justify-center shadow-md group-hover:shadow-lg transition-shadow">
-                                    <i class="ri-book-2-fill text-white text-xl"></i>
-                                </div>
-                                <div>
-                                    <p class="text-gray-800 dark:text-white font-semibold">Écriture Créative 101</p>
-                                    <p class="text-sm text-gray-500 dark:text-gray-light lg:hidden">Écriture</p>
-                                </div>
-                            </div>
-                        </td>
-                        <td class="py-5 text-gray-600 dark:text-gray-light">Emma Bernard</td>
-                        <td class="py-5 text-gray-600 dark:text-gray-light hidden lg:table-cell">
-                            <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-purple-100 text-purple-800 dark:bg-purple-900/20 dark:text-purple-400">
-                                Écriture
-                            </span>
-                        </td>
-                        <td class="py-5 text-gray-800 dark:text-white font-semibold">19,99 €</td>
-                        <td class="py-5 text-gray-800 dark:text-white hidden sm:table-cell">1 567</td>
-                        <td class="py-5 text-green-600 dark:text-green-400 font-bold">31 324,33 €</td>
-                        <td class="py-5">
-                            <div class="flex items-center space-x-2">
-                                <button class="p-2 hover:bg-gray-100 dark:hover:bg-gray-soft rounded-lg text-gray-600 dark:text-gray-light hover:text-gray-800 dark:hover:text-white transition-colors">
-                                    <i class="ri-eye-line text-lg"></i>
-                                </button>
-                                <button class="p-2 hover:bg-gray-100 dark:hover:bg-gray-soft rounded-lg text-gray-600 dark:text-gray-light hover:text-gray-800 dark:hover:text-white transition-colors">
-                                    <i class="ri-more-2-fill text-lg"></i>
-                                </button>
-                            </div>
-                        </td>
-                    </tr>
-                    <tr class="hover:bg-gray-50 dark:hover:bg-gray-soft/50 transition-colors group">
-                        <td class="py-5">
-                            <div class="flex items-center space-x-4">
-                                <div class="w-12 h-16 bg-gradient-to-br from-red-500 to-red-600 rounded-lg flex items-center justify-center shadow-md group-hover:shadow-lg transition-shadow">
-                                    <i class="ri-book-2-fill text-white text-xl"></i>
-                                </div>
-                                <div>
-                                    <p class="text-gray-800 dark:text-white font-semibold">Marketing Digital</p>
-                                    <p class="text-sm text-gray-500 dark:text-gray-light lg:hidden">Business</p>
-                                </div>
-                            </div>
-                        </td>
-                        <td class="py-5 text-gray-600 dark:text-gray-light">Pierre Moreau</td>
-                        <td class="py-5 text-gray-600 dark:text-gray-light hidden lg:table-cell">
-                            <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-orange-100 text-orange-800 dark:bg-orange-900/20 dark:text-orange-400">
-                                Business
-                            </span>
-                        </td>
-                        <td class="py-5 text-gray-800 dark:text-white font-semibold">29,99 €</td>
-                        <td class="py-5 text-gray-800 dark:text-white hidden sm:table-cell">743</td>
-                        <td class="py-5 text-green-600 dark:text-green-400 font-bold">22 282,57 €</td>
-                        <td class="py-5">
-                            <div class="flex items-center space-x-2">
-                                <button class="p-2 hover:bg-gray-100 dark:hover:bg-gray-soft rounded-lg text-gray-600 dark:text-gray-light hover:text-gray-800 dark:hover:text-white transition-colors">
-                                    <i class="ri-eye-line text-lg"></i>
-                                </button>
-                                <button class="p-2 hover:bg-gray-100 dark:hover:bg-gray-soft rounded-lg text-gray-600 dark:text-gray-light hover:text-gray-800 dark:hover:text-white transition-colors">
-                                    <i class="ri-more-2-fill text-lg"></i>
-                                </button>
-                            </div>
-                        </td>
-                    </tr>
-                    <tr class="hover:bg-gray-50 dark:hover:bg-gray-soft/50 transition-colors group">
-                        <td class="py-5">
-                            <div class="flex items-center space-x-4">
-                                <div class="w-12 h-16 bg-gradient-to-br from-indigo-500 to-indigo-600 rounded-lg flex items-center justify-center shadow-md group-hover:shadow-lg transition-shadow">
-                                    <i class="ri-book-2-fill text-white text-xl"></i>
-                                </div>
-                                <div>
-                                    <p class="text-gray-800 dark:text-white font-semibold">Design UX/UI</p>
-                                    <p class="text-sm text-gray-500 dark:text-gray-light lg:hidden">Design</p>
-                                </div>
-                            </div>
-                        </td>
-                        <td class="py-5 text-gray-600 dark:text-gray-light">Sophie Laurent</td>
-                        <td class="py-5 text-gray-600 dark:text-gray-light hidden lg:table-cell">
-                            <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-pink-100 text-pink-800 dark:bg-pink-900/20 dark:text-pink-400">
-                                Design
-                            </span>
-                        </td>
-                        <td class="py-5 text-gray-800 dark:text-white font-semibold">39,99 €</td>
-                        <td class="py-5 text-gray-800 dark:text-white hidden sm:table-cell">521</td>
-                        <td class="py-5 text-green-600 dark:text-green-400 font-bold">20 839,79 €</td>
-                        <td class="py-5">
-                            <div class="flex items-center space-x-2">
-                                <button class="p-2 hover:bg-gray-100 dark:hover:bg-gray-soft rounded-lg text-gray-600 dark:text-gray-light hover:text-gray-800 dark:hover:text-white transition-colors">
-                                    <i class="ri-eye-line text-lg"></i>
-                                </button>
-                                <button class="p-2 hover:bg-gray-100 dark:hover:bg-gray-soft rounded-lg text-gray-600 dark:text-gray-light hover:text-gray-800 dark:hover:text-white transition-colors">
-                                    <i class="ri-more-2-fill text-lg"></i>
-                                </button>
-                            </div>
-                        </td>
-                    </tr>
+                    @endforeach
                 </tbody>
             </table>
         </div>

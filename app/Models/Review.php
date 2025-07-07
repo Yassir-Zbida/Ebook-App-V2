@@ -16,11 +16,13 @@ class Review extends Model
         'rating',
         'review',
         'is_approved',
+        'status',
     ];
 
     protected $casts = [
         'rating' => 'integer',
         'is_approved' => 'boolean',
+        'status' => 'string',
     ];
 
     /**
@@ -53,5 +55,37 @@ class Review extends Model
     public function scopeForEbook($query, $ebookId)
     {
         return $query->where('ebook_id', $ebookId);
+    }
+
+    /**
+     * Scope to get reviews by status
+     */
+    public function scopeByStatus($query, $status)
+    {
+        return $query->where('status', $status);
+    }
+
+    /**
+     * Scope to get only pending reviews
+     */
+    public function scopePending($query)
+    {
+        return $query->where('status', 'pending');
+    }
+
+    /**
+     * Scope to get only approved reviews (by status)
+     */
+    public function scopeStatusApproved($query)
+    {
+        return $query->where('status', 'approved');
+    }
+
+    /**
+     * Scope to get only rejected reviews
+     */
+    public function scopeRejected($query)
+    {
+        return $query->where('status', 'rejected');
     }
 }
