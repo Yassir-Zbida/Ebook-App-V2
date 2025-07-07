@@ -382,7 +382,7 @@
                         <div x-show="open"
                             x-collapse
                             class="mt-2 ml-8 space-y-1 border-l-2 border-gray-200 dark:border-gray-700 pl-4">
-                            <a href="#" class="flex items-center space-x-3 px-3 py-2 text-sm text-sidebar-text-muted dark:text-sidebar-text-muted-dark hover:text-primary hover:bg-primary/5 rounded-lg transition-all duration-200 group">
+                            <a href="{{ route('admin.ebooks.index') }}" class="flex items-center space-x-3 px-3 py-2 text-sm text-sidebar-text-muted dark:text-sidebar-text-muted-dark hover:text-primary hover:bg-primary/5 rounded-lg transition-all duration-200 group {{ request()->routeIs('admin.ebooks.index') ? 'text-primary bg-primary/5' : '' }}">
                                 <i class="ri-book-open-line text-base group-hover:scale-110 transition-transform"></i>
                                 <span>Tous les livres</span>
                             </a>
@@ -394,7 +394,7 @@
                                 <i class="ri-user-line text-base group-hover:scale-110 transition-transform"></i>
                                 <span>Auteurs</span>
                             </a>
-                            <a href="#" class="flex items-center space-x-3 px-3 py-2 text-sm text-sidebar-text-muted dark:text-sidebar-text-muted-dark hover:text-primary hover:bg-primary/5 rounded-lg transition-all duration-200 group">
+                            <a href="{{ route('admin.ebooks.create') }}" class="flex items-center space-x-3 px-3 py-2 text-sm text-sidebar-text-muted dark:text-sidebar-text-muted-dark hover:text-primary hover:bg-primary/5 rounded-lg transition-all duration-200 group {{ request()->routeIs('admin.ebooks.create') ? 'text-primary bg-primary/5' : '' }}">
                                 <i class="ri-add-line text-base group-hover:scale-110 transition-transform"></i>
                                 <span>Ajouter un livre</span>
                             </a>
@@ -746,7 +746,7 @@
                 <div class="mb-6">
                     <h3 class="text-sm font-medium text-gray-500 dark:text-gray-400 mb-3">Actions rapides</h3>
                     <div class="grid grid-cols-2 gap-3">
-                        <button class="flex items-center space-x-3 p-3 hover:bg-gray-50 dark:hover:bg-gray-800 rounded-xl transition-all duration-200 group text-left">
+                        <a href="{{ route('admin.ebooks.create') }}" class="flex items-center space-x-3 p-3 hover:bg-gray-50 dark:hover:bg-gray-800 rounded-xl transition-all duration-200 group text-left">
                             <div class="w-8 h-8 bg-blue-100 dark:bg-blue-900/30 rounded-lg flex items-center justify-center">
                                 <i class="ri-add-line text-blue-600 dark:text-blue-400"></i>
                             </div>
@@ -754,7 +754,7 @@
                                 <p class="text-sm font-medium text-gray-900 dark:text-gray-100">Ajouter un livre</p>
                                 <p class="text-xs text-gray-500 dark:text-gray-400">Nouveau produit</p>
                             </div>
-                        </button>
+                        </a>
                         <button class="flex items-center space-x-3 p-3 hover:bg-gray-50 dark:hover:bg-gray-800 rounded-xl transition-all duration-200 group text-left">
                             <div class="w-8 h-8 bg-green-100 dark:bg-green-900/30 rounded-lg flex items-center justify-center">
                                 <i class="ri-user-add-line text-green-600 dark:text-green-400"></i>

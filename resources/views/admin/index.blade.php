@@ -270,10 +270,10 @@
                     </div>
                 </div>
 
-                <button class="mt-6 w-full bg-gradient-to-r from-primary to-primary-light hover:from-primary-dark hover:to-primary text-white font-semibold py-4 rounded-xl transition-all duration-200 shadow-lg hover:shadow-xl hover:scale-105 active:scale-95 flex items-center justify-center space-x-2">
+                <a href="{{ route('admin.ebooks.create') }}" class="mt-6 w-full bg-gradient-to-r from-primary to-primary-light hover:from-primary-dark hover:to-primary text-white font-semibold py-4 rounded-xl transition-all duration-200 shadow-lg hover:shadow-xl hover:scale-105 active:scale-95 flex items-center justify-center space-x-2">
                     <i class="ri-add-line text-lg"></i>
                     <span>Ajouter un nouvel ebook</span>
-                </button>
+                </a>
             </div>
         </div>
     </div>
@@ -369,7 +369,7 @@
 
     <!-- Quick Actions -->
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-        <div class="bg-white dark:bg-gray-dark border border-gray-200 dark:border-gray-soft rounded-2xl p-6 card-shadow hover:scale-105 transition-all duration-300 group cursor-pointer">
+        <a href="{{ route('admin.ebooks.create') }}" class="bg-white dark:bg-gray-dark border border-gray-200 dark:border-gray-soft rounded-2xl p-6 card-shadow hover:scale-105 transition-all duration-300 group cursor-pointer">
             <div class="flex items-center space-x-4">
                 <div class="w-12 h-12 bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl flex items-center justify-center shadow-lg group-hover:shadow-xl transition-shadow">
                     <i class="ri-add-line text-white text-xl"></i>
@@ -379,7 +379,7 @@
                     <p class="text-sm text-gray-600 dark:text-gray-light">Ajouter un produit</p>
                 </div>
             </div>
-        </div>
+        </a>
 
         <div class="bg-white dark:bg-gray-dark border border-gray-200 dark:border-gray-soft rounded-2xl p-6 card-shadow hover:scale-105 transition-all duration-300 group cursor-pointer">
             <div class="flex items-center space-x-4">
